@@ -396,11 +396,14 @@ async def job_status(job_id: str):
         raise HTTPException(status_code=404, detail="Job not found")
 
     if job["status"] == "done":
-        return {
-            "status":       "done",
-            "input_size":   job["input_size"],
-            "output_size":  job["output_size"],
+        resp: dict = {
+            "status":      "done",
+            "input_size":  job["input_size"],
+            "output_size": job["output_size"],
         }
+        if "page_count" in job:
+            resp["page_count"] = job["page_count"]
+        return resp
     if job["status"] == "error":
         return {"status": "error", "error": job.get("error", "Unknown error")}
 
@@ -494,6 +497,112 @@ async def jpg_to_pdf(
     threading.Thread(
         target=_run_jpg_to_pdf,
         args=(job_id, image_paths, out_path, level, tmp_dir),
+        daemon=True,
+    ).start()
+
+    return JSONResponse({"job_id": job_id})
+
+
+def _run_pdf_to_jpg(job_id: str, pdf_path: str, dpi: int, tmp_dir: str):
+    """Background thread: render each PDF page to a JPEG via Ghostscript."""
+    try:
+        out_pattern = os.path.join(tmp_dir, "page_%04d.jpg")
+        cmd = [
+            "gs", "-sDEVICE=jpeg",
+            "-dNOPAUSE", "-dQUIET", "-dBATCH",
+            f"-r{dpi}",
+            "-dJPEGQ=92",
+            f"-sOutputFile={out_pattern}",
+            pdf_path,
+        ]
+        result = subprocess.run(cmd, capture_output=True, timeout=600)
+
+        if result.returncode != 0:
+            err = result.stderr.decode(errors="replace")
+            with _jobs_lock:
+                _jobs[job_id].update({"status": "error", "error": f"Conversion error: {err}"})
+            return
+
+        jpg_files = sorted(
+            os.path.join(tmp_dir, f)
+            for f in os.listdir(tmp_dir)
+            if f.endswith(".jpg")
+        )
+
+        if not jpg_files:
+            with _jobs_lock:
+                _jobs[job_id].update({"status": "error", "error": "No images were generated"})
+            return
+
+        input_size = os.path.getsize(pdf_path)
+
+        if len(jpg_files) == 1:
+            # Single-page PDF — serve the JPG directly
+            out_size = os.path.getsize(jpg_files[0])
+            with _jobs_lock:
+                _jobs[job_id].update({
+                    "status": "done", "serve_path": jpg_files[0],
+                    "input_size": input_size, "output_size": out_size,
+                    "output_filename": "page_0001.jpg",
+                    "output_content_type": "image/jpeg",
+                    "page_count": 1,
+                })
+        else:
+            # Multi-page — bundle into a ZIP
+            zip_path = os.path.join(tmp_dir, "pdf_pages.zip")
+            with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_STORED) as zf:
+                for jpg in jpg_files:
+                    zf.write(jpg, os.path.basename(jpg))
+            zip_size = os.path.getsize(zip_path)
+            with _jobs_lock:
+                _jobs[job_id].update({
+                    "status": "done", "serve_path": zip_path,
+                    "input_size": input_size, "output_size": zip_size,
+                    "output_filename": "pdf_pages.zip",
+                    "output_content_type": "application/zip",
+                    "page_count": len(jpg_files),
+                })
+
+    except subprocess.TimeoutExpired:
+        with _jobs_lock:
+            _jobs[job_id].update({"status": "error", "error": "Processing timed out (600s)"})
+    except Exception as e:
+        with _jobs_lock:
+            _jobs[job_id].update({"status": "error", "error": str(e)})
+
+
+@app.post("/pdf-to-jpg")
+async def pdf_to_jpg(
+    file: UploadFile = File(...),
+    quality: str = Form("standard"),
+):
+    """Render every page of a PDF as a JPEG. Returns job_id for polling."""
+    _prune_old_jobs()
+
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+
+    DPI_MAP = {"standard": 150, "high": 200, "max": 300}
+    dpi = DPI_MAP.get(quality, 150)
+
+    content = await file.read()
+    job_id  = str(uuid.uuid4())
+    tmp_dir = tempfile.mkdtemp()
+    in_path = os.path.join(tmp_dir, "input.pdf")
+
+    with open(in_path, "wb") as f:
+        f.write(content)
+
+    with _jobs_lock:
+        _jobs[job_id] = {
+            "status":     "processing",
+            "tmp_dir":    tmp_dir,
+            "created_at": time.time(),
+        }
+
+    threading.Thread(
+        target=_run_pdf_to_jpg,
+        args=(job_id, in_path, dpi, tmp_dir),
         daemon=True,
     ).start()
 

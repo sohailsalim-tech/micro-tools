@@ -44,11 +44,11 @@ const tools = [
     badgeColor: "bg-orange-500",
   },
   {
-    href: "#",
+    href: "/pdf-to-jpg",
     emoji: "📄",
     title: "PDF to JPG",
     description: "Convert every page of a PDF into high-quality images.",
-    badge: "SOON",
+    badge: "NEW",
     color: "from-rose-500/10 to-pink-500/10",
     border: "hover:border-rose-400",
     badgeColor: "bg-rose-500",
