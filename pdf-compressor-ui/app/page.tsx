@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import Image from "next/image"; // used for OPUS logo in header
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const tools = [
@@ -75,13 +75,7 @@ export default function HomePage() {
             <Image src="/opus-logo.png" alt="OPUS" width={36} height={36} />
             <span className="font-bold text-lg text-foreground tracking-tight">OPUS PDF Tools</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Image src="/astral-tech-logo.png" alt="Astral Tech" width={16} height={16} />
-              <span className="hidden sm:inline">by Astral Hatch</span>
-            </div>
-            <ThemeToggle />
-          </div>
+          <ThemeToggle />
         </div>
       </header>
 

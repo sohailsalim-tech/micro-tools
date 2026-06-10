@@ -520,9 +520,9 @@ export function PDFCompressor() {
             <ShieldIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
             <span className="line-clamp-1">Your privacy is protected. No files stored.</span>
           </div>
-          <div className="flex items-center justify-center gap-1 sm:gap-1.5">
-            <AstralTechIcon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-            <span className="text-xs sm:text-sm">Powered by Astral Tech</span>
+          <div className="flex items-center justify-center gap-1.5">
+            <Image src="/opus-logo.png" alt="OPUS" width={14} height={14} className="opacity-40" />
+            <span className="text-xs sm:text-sm">OPUS PDF Tools</span>
           </div>
         </footer>
       </div>

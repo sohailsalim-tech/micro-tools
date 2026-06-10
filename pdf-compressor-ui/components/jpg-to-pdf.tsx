@@ -182,7 +182,7 @@ export function JpgToPdf() {
             <ThemeToggle />
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center text-xl">🖼️</div>
+            <div className="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center text-3xl">🖼️</div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-foreground">JPG to PDF</h1>
               <p className="text-xs sm:text-sm text-muted-foreground">Combine images into one compressed PDF album</p>
@@ -360,9 +360,9 @@ export function JpgToPdf() {
 
         {/* Footer */}
         <footer className="mt-5 text-center text-xs text-muted-foreground">
-          <div className="flex items-center justify-center gap-2">
-            <Image src="/astral-tech-logo.png" alt="Astral Tech" width={14} height={14} />
-            <span>Powered by Astral Hatch Technologies</span>
+          <div className="flex items-center justify-center gap-1.5">
+            <Image src="/opus-logo.png" alt="OPUS" width={14} height={14} className="opacity-40" />
+            <span>OPUS PDF Tools</span>
           </div>
         </footer>
       </div>
