@@ -131,7 +131,7 @@ export default function HomePage() {
       <section className="border-t border-border bg-card/50">
         <div className="max-w-5xl mx-auto px-4 py-6 flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm text-muted-foreground">
           <span className="flex items-center gap-1.5">🔒 Files never stored</span>
-          <span className="flex items-center gap-1.5">⚡ Powered by Ghostscript</span>
+          <span className="flex items-center gap-1.5">⚡ Powered by Astral Tech</span>
           <span className="flex items-center gap-1.5">🆓 Always free</span>
           <span className="flex items-center gap-1.5">🌍 Works on all devices</span>
         </div>
