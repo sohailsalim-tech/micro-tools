@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type Status = "idle" | "selected" | "compressing" | "complete";
 
@@ -174,9 +175,12 @@ export function JpgToPdf() {
 
         {/* Back + Header */}
         <div className="mb-5">
-          <Link href="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 mb-4">
-            ← All tools
-          </Link>
+          <div className="flex items-center justify-between mb-4">
+            <Link href="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
+              ← All tools
+            </Link>
+            <ThemeToggle />
+          </div>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center text-xl">🖼️</div>
             <div>
