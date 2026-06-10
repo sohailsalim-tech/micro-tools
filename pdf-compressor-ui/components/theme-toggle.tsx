@@ -4,19 +4,17 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-
-  // Avoid hydration mismatch — render nothing until mounted on client
   useEffect(() => setMounted(true), []);
-  if (!mounted) return <div className="w-9 h-9" />;
 
-  const isDark = theme === "dark";
+  const isDark = resolvedTheme === "dark";
 
   return (
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
       aria-label="Toggle theme"
+      suppressHydrationWarning
       className="
         w-9 h-9 rounded-lg border border-border
         flex items-center justify-center
@@ -25,7 +23,7 @@ export function ThemeToggle() {
         focus:outline-none focus-visible:ring-2 focus-visible:ring-ring
       "
     >
-      {isDark ? (
+      {mounted && isDark ? (
         /* Sun icon */
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
           viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
