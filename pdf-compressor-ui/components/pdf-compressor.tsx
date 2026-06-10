@@ -196,12 +196,16 @@ export function PDFCompressor() {
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
 
+      // Prefer the server-reported sizes (accurate even when fallback to original)
+      const serverOriginal  = Number(response.headers.get("X-Original-Size"))   || file.size;
+      const serverCompressed = Number(response.headers.get("X-Compressed-Size")) || blob.size;
+
       setProgress(100);
       setCompressedFileUrl(url);
       setResult({
-        originalSize: file.size,
-        compressedSize: blob.size,
-        reduction: ((file.size - blob.size) / file.size) * 100,
+        originalSize:   serverOriginal,
+        compressedSize: serverCompressed,
+        reduction: ((serverOriginal - serverCompressed) / serverOriginal) * 100,
       });
       setStatus("complete");
     } catch (err) {
@@ -433,10 +437,17 @@ export function PDFCompressor() {
                   </div>
                 </div>
                 <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border text-center">
-                  <span className="inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-accent">
-                    <span className="text-base">↓</span>
-                    {Math.round(result.reduction)}% smaller
-                  </span>
+                  {result.reduction > 1 ? (
+                    <span className="inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-accent">
+                      <span className="text-base">↓</span>
+                      {Math.round(result.reduction)}% smaller
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-muted-foreground">
+                      <span className="text-base">✓</span>
+                      Already optimised — original returned
+                    </span>
+                  )}
                 </div>
               </div>
 
