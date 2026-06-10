@@ -104,27 +104,11 @@ function GlobeIcon({ className }: { className?: string }) {
 }
 
 function OpusLogo({ className }: { className?: string }) {
-  return (
-    <Image
-      src="/opus-logo.png"
-      alt="OPUS Suite Logo"
-      width={48}
-      height={48}
-      className={className}
-    />
-  );
+  return <div className={className}>OPUS</div>;
 }
 
 function AstralTechIcon({ className }: { className?: string }) {
-  return (
-    <Image
-      src="/astral-tech-logo.png"
-      alt="Astral Tech"
-      width={24}
-      height={24}
-      className={className}
-    />
-  );
+  return <div className={className}>AT</div>;
 }
 
 export function PDFCompressor() {
