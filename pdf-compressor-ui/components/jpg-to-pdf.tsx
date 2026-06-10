@@ -362,7 +362,7 @@ export function JpgToPdf() {
         <footer className="mt-5 text-center text-xs text-muted-foreground">
           <div className="flex items-center justify-center gap-1.5">
             <Image src="/opus-logo.png" alt="OPUS" width={14} height={14} className="opacity-40" />
-            <span>OPUS PDF Tools</span>
+            <span>OPUS Productivity Tools</span>
           </div>
         </footer>
       </div>

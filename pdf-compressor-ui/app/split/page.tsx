@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SplitPdf } from "@/components/split-pdf";
 
 export const metadata: Metadata = {
-  title: "Split PDF – OPUS PDF Tools",
+  title: "Split PDF – OPUS Productivity Tools",
   description: "Extract pages or split a PDF into multiple files. Free, fast, no signup.",
 };
 

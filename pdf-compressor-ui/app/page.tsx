@@ -72,8 +72,8 @@ export default function HomePage() {
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Image src="/opus-logo.png" alt="TecPDF" width={36} height={36} />
-            <span className="font-bold text-lg text-foreground tracking-tight">TecPDF</span>
+            <Image src="/opus-logo.png" alt="OPUS Productivity Tools" width={36} height={36} />
+            <span className="font-bold text-lg text-foreground tracking-tight">OPUS Productivity Tools</span>
           </div>
           <ThemeToggle />
         </div>

@@ -283,7 +283,7 @@ export function PDFCompressor() {
           </div>
           <div className="text-center">
             <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-1 sm:mb-2 tracking-tight">
-              OPUS PDF Compressor
+              OPUS Productivity Tools
             </h1>
             <p className="text-muted-foreground text-sm sm:text-lg leading-tight">
               Compress PDF files up to 90% • Free &amp; Instant
@@ -522,7 +522,7 @@ export function PDFCompressor() {
           </div>
           <div className="flex items-center justify-center gap-1.5">
             <Image src="/opus-logo.png" alt="OPUS" width={14} height={14} className="opacity-40" />
-            <span className="text-xs sm:text-sm">OPUS PDF Tools</span>
+            <span className="text-xs sm:text-sm">OPUS Productivity Tools</span>
           </div>
         </footer>
       </div>

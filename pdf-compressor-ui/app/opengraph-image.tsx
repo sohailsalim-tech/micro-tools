@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "TecPDF — Free PDF Tools Online";
+export const alt = "OPUS Productivity Tools — Free PDF Tools Online";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -40,7 +40,7 @@ export default async function OGImage() {
             📄
           </div>
           <span style={{ fontSize: 56, fontWeight: 800, color: "#F1F5F9", letterSpacing: "-2px" }}>
-            TecPDF
+            OPUS Productivity Tools
           </span>
         </div>
 
