@@ -500,6 +500,75 @@ async def jpg_to_pdf(
     return JSONResponse({"job_id": job_id})
 
 
+def _run_protect_pdf(job_id: str, pdf_path: str, password: str, output_path: str, tmp_dir: str):
+    """Background thread: encrypt PDF with a user password using pypdf."""
+    try:
+        writer = PdfWriter()
+        writer.append(pdf_path)
+        writer.encrypt(user_password=password, owner_password=password, use_128bit=True)
+        with open(output_path, "wb") as f:
+            writer.write(f)
+        writer.close()
+
+        input_size  = os.path.getsize(pdf_path)
+        output_size = os.path.getsize(output_path)
+
+        with _jobs_lock:
+            _jobs[job_id].update({
+                "status":               "done",
+                "serve_path":           output_path,
+                "input_size":           input_size,
+                "output_size":          output_size,
+                "output_filename":      "protected.pdf",
+                "output_content_type":  "application/pdf",
+            })
+    except Exception as e:
+        with _jobs_lock:
+            _jobs[job_id].update({"status": "error", "error": str(e)})
+
+
+@app.post("/protect-pdf")
+async def protect_pdf(
+    file: UploadFile = File(...),
+    password: str = Form(...),
+):
+    """Encrypt a PDF with a password. Returns job_id for polling."""
+    _prune_old_jobs()
+
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+
+    if not password or len(password.strip()) == 0:
+        raise HTTPException(status_code=400, detail="Password cannot be empty")
+
+    if len(password) > 128:
+        raise HTTPException(status_code=400, detail="Password must be 128 characters or fewer")
+
+    content  = await file.read()
+    job_id   = str(uuid.uuid4())
+    tmp_dir  = tempfile.mkdtemp()
+    in_path  = os.path.join(tmp_dir, "input.pdf")
+    out_path = os.path.join(tmp_dir, "protected.pdf")
+
+    with open(in_path, "wb") as f:
+        f.write(content)
+
+    with _jobs_lock:
+        _jobs[job_id] = {
+            "status":     "processing",
+            "tmp_dir":    tmp_dir,
+            "created_at": time.time(),
+        }
+
+    threading.Thread(
+        target=_run_protect_pdf,
+        args=(job_id, in_path, password, out_path, tmp_dir),
+        daemon=True,
+    ).start()
+
+    return JSONResponse({"job_id": job_id})
+
+
 @app.post("/pdf-info")
 async def pdf_info(file: UploadFile = File(...)):
     """Return page count without storing anything — fast, synchronous."""

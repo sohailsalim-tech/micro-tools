@@ -54,11 +54,11 @@ const tools = [
     badgeColor: "bg-rose-500",
   },
   {
-    href: "#",
+    href: "/protect",
     emoji: "🔒",
     title: "Protect PDF",
     description: "Add a password to your PDF to prevent unauthorised access.",
-    badge: "SOON",
+    badge: "NEW",
     color: "from-sky-500/10 to-cyan-500/10",
     border: "hover:border-sky-400",
     badgeColor: "bg-sky-500",
