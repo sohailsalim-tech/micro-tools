@@ -23,53 +23,37 @@ app.add_middleware(
 
 VALID_LEVELS = {"/screen", "/ebook", "/printer", "/prepress"}
 
-# Per-level Ghostscript flags.
-# Key additions vs the bare PDFSETTINGS default:
-#   - ColorConversionStrategy/sRGB : converts CMYK print PDFs to RGB (removes
-#     the 4th ink channel — big win on "4c" / press-ready files)
-#   - DownsampleThreshold=1.0      : downsample ANY image above the target DPI,
-#     not just those > 1.5× (the lax default)
-#   - AutoFilterColorImages=false + DCTEncode : force JPEG re-encoding instead
-#     of letting GS decide to keep lossless
 LEVEL_PARAMS: dict[str, list[str]] = {
     "/screen": [
-        "-dColorConversionStrategy=/sRGB",
         "-dDownsampleColorImages=true",
         "-dColorImageDownsampleType=/Bicubic",
         "-dColorImageResolution=72",
-        "-dColorImageDownsampleThreshold=1.0",
         "-dAutoFilterColorImages=false",
         "-dColorImageFilter=/DCTEncode",
         "-dDownsampleGrayImages=true",
         "-dGrayImageDownsampleType=/Bicubic",
         "-dGrayImageResolution=72",
-        "-dGrayImageDownsampleThreshold=1.0",
         "-dAutoFilterGrayImages=false",
         "-dGrayImageFilter=/DCTEncode",
         "-dDownsampleMonoImages=true",
         "-dMonoImageResolution=72",
-        "-dMonoImageDownsampleThreshold=1.0",
         "-dCompressFonts=true",
         "-dSubsetFonts=true",
         "-dDetectDuplicateImages=true",
     ],
     "/ebook": [
-        "-dColorConversionStrategy=/sRGB",
         "-dDownsampleColorImages=true",
         "-dColorImageDownsampleType=/Bicubic",
         "-dColorImageResolution=150",
-        "-dColorImageDownsampleThreshold=1.0",
         "-dAutoFilterColorImages=false",
         "-dColorImageFilter=/DCTEncode",
         "-dDownsampleGrayImages=true",
         "-dGrayImageDownsampleType=/Bicubic",
         "-dGrayImageResolution=150",
-        "-dGrayImageDownsampleThreshold=1.0",
         "-dAutoFilterGrayImages=false",
         "-dGrayImageFilter=/DCTEncode",
         "-dDownsampleMonoImages=true",
         "-dMonoImageResolution=150",
-        "-dMonoImageDownsampleThreshold=1.0",
         "-dCompressFonts=true",
         "-dSubsetFonts=true",
         "-dDetectDuplicateImages=true",
@@ -78,14 +62,11 @@ LEVEL_PARAMS: dict[str, list[str]] = {
         "-dDownsampleColorImages=true",
         "-dColorImageDownsampleType=/Bicubic",
         "-dColorImageResolution=300",
-        "-dColorImageDownsampleThreshold=1.0",
         "-dDownsampleGrayImages=true",
         "-dGrayImageDownsampleType=/Bicubic",
         "-dGrayImageResolution=300",
-        "-dGrayImageDownsampleThreshold=1.0",
         "-dDownsampleMonoImages=true",
         "-dMonoImageResolution=300",
-        "-dMonoImageDownsampleThreshold=1.0",
         "-dCompressFonts=true",
         "-dSubsetFonts=true",
     ],
@@ -93,36 +74,6 @@ LEVEL_PARAMS: dict[str, list[str]] = {
         "-dCompressFonts=true",
         "-dSubsetFonts=true",
     ],
-}
-
-# Inline PostScript distiller params that set explicit JPEG QFactor per level.
-# QFactor: 0.15=max quality  0.9=good  1.5=medium  2.4=max compression
-# Passed via  -c "code" -f input.pdf  so they apply before the file is processed.
-DISTILLER_PARAMS: dict[str, str] = {
-    "/screen": (
-        "<< "
-        "/ColorACSImageDict << /QFactor 2.4 /Blend 1 /ColorTransform 1 "
-        "   /HSamples [2 1 1 2] /VSamples [2 1 1 2] >> "
-        "/GrayACSImageDict  << /QFactor 2.4 /Blend 1 "
-        "   /HSamples [2 1 1 2] /VSamples [2 1 1 2] >> "
-        "/ColorImageDict    << /QFactor 2.4 /Blend 1 /ColorTransform 1 "
-        "   /HSamples [2 1 1 2] /VSamples [2 1 1 2] >> "
-        "/GrayImageDict     << /QFactor 2.4 /Blend 1 "
-        "   /HSamples [2 1 1 2] /VSamples [2 1 1 2] >> "
-        ">> setdistillerparams"
-    ),
-    "/ebook": (
-        "<< "
-        "/ColorACSImageDict << /QFactor 1.5 /Blend 1 /ColorTransform 1 "
-        "   /HSamples [2 1 1 2] /VSamples [2 1 1 2] >> "
-        "/GrayACSImageDict  << /QFactor 1.5 /Blend 1 "
-        "   /HSamples [2 1 1 2] /VSamples [2 1 1 2] >> "
-        "/ColorImageDict    << /QFactor 1.5 /Blend 1 /ColorTransform 1 "
-        "   /HSamples [2 1 1 2] /VSamples [2 1 1 2] >> "
-        "/GrayImageDict     << /QFactor 1.5 /Blend 1 "
-        "   /HSamples [2 1 1 2] /VSamples [2 1 1 2] >> "
-        ">> setdistillerparams"
-    ),
 }
 
 
@@ -156,25 +107,21 @@ async def compress_pdf(
         with open(input_path, "wb") as f:
             f.write(content)
 
-        base_cmd = [
-            "gs",
-            "-sDEVICE=pdfwrite",
-            "-dCompatibilityLevel=1.4",
-            f"-dPDFSETTINGS={level}",
-            "-dNOPAUSE",
-            "-dQUIET",
-            "-dBATCH",
-            "-dSAFER",
-        ] + LEVEL_PARAMS.get(level, []) + [f"-sOutputFile={output_path}"]
+        cmd = (
+            [
+                "gs",
+                "-sDEVICE=pdfwrite",
+                "-dCompatibilityLevel=1.4",
+                f"-dPDFSETTINGS={level}",
+                "-dNOPAUSE",
+                "-dQUIET",
+                "-dBATCH",
+                "-dSAFER",
+            ]
+            + LEVEL_PARAMS.get(level, [])
+            + [f"-sOutputFile={output_path}", input_path]
+        )
 
-        # If this level has distiller params, use -c <params> -f <file>
-        # so the quality settings are applied before GS processes the PDF.
-        if level in DISTILLER_PARAMS:
-            cmd = base_cmd + ["-c", DISTILLER_PARAMS[level], "-f", input_path]
-        else:
-            cmd = base_cmd + [input_path]
-
-        # 10 min timeout — large files (100 MB+) can take several minutes
         result = subprocess.run(cmd, capture_output=True, timeout=600)
 
         if result.returncode != 0:
@@ -189,7 +136,6 @@ async def compress_pdf(
         input_size  = os.path.getsize(input_path)
         output_size = os.path.getsize(output_path)
 
-        # Never return a file larger than the original
         serve_path = output_path if output_size < input_size else input_path
 
         def cleanup():
