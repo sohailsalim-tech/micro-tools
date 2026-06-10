@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import Image from "next/image";
 
 type CompressionLevel = "screen" | "ebook" | "printer" | "prepress";
 type Status = "idle" | "selected" | "compressing" | "complete";
