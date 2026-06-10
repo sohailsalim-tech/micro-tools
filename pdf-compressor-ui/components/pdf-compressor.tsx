@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 type CompressionLevel = "screen" | "ebook" | "printer" | "prepress";
 type Status = "idle" | "selected" | "compressing" | "complete" | "error";
@@ -270,6 +271,9 @@ export function PDFCompressor() {
       <div className="mx-auto max-w-[600px] w-full">
         {/* Header */}
         <header className="mb-5 sm:mb-8">
+          <Link href="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-4">
+            ← All tools
+          </Link>
           <div className="flex justify-center mb-4 sm:mb-6">
             <OpusLogo className="w-12 h-12 sm:w-16 sm:h-16" />
           </div>

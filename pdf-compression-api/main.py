@@ -9,6 +9,8 @@ import shutil
 import uuid
 import threading
 import time
+from typing import List
+from PIL import Image
 
 app = FastAPI(title="OPUS PDF Compressor API")
 
@@ -156,6 +158,58 @@ def _run_ghostscript(job_id: str, input_path: str, output_path: str, level: str,
 # Routes
 # ---------------------------------------------------------------------------
 
+def _run_jpg_to_pdf(job_id: str, image_paths: list[str], output_path: str, level: str, tmp_dir: str):
+    """Background thread: combine images → PDF → compress with GS."""
+    try:
+        # Step 1: combine images into a raw PDF using Pillow
+        raw_pdf = os.path.join(tmp_dir, "raw.pdf")
+        imgs = []
+        for p in image_paths:
+            img = Image.open(p).convert("RGB")
+            imgs.append(img)
+
+        if not imgs:
+            with _jobs_lock:
+                _jobs[job_id].update({"status": "error", "error": "No valid images found"})
+            return
+
+        imgs[0].save(raw_pdf, save_all=True, append_images=imgs[1:], resolution=150)
+        for img in imgs:
+            img.close()
+
+        # Step 2: compress the combined PDF with Ghostscript
+        cmd = (
+            ["gs", "-sDEVICE=pdfwrite", "-dCompatibilityLevel=1.4",
+             f"-dPDFSETTINGS={level}", "-dNOPAUSE", "-dQUIET", "-dBATCH", "-dSAFER"]
+            + LEVEL_PARAMS.get(level, [])
+            + [f"-sOutputFile={output_path}", raw_pdf]
+        )
+        result = subprocess.run(cmd, capture_output=True, timeout=600)
+
+        if result.returncode != 0:
+            err = result.stderr.decode(errors="replace")
+            with _jobs_lock:
+                _jobs[job_id].update({"status": "error", "error": f"Ghostscript error: {err}"})
+            return
+
+        raw_size  = os.path.getsize(raw_pdf)
+        out_size  = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+        serve     = output_path if (out_size > 0 and out_size < raw_size) else raw_pdf
+        final_size = os.path.getsize(serve)
+
+        with _jobs_lock:
+            _jobs[job_id].update({
+                "status":      "done",
+                "serve_path":  serve,
+                "input_size":  raw_size,
+                "output_size": final_size,
+            })
+
+    except Exception as e:
+        with _jobs_lock:
+            _jobs[job_id].update({"status": "error", "error": str(e)})
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
@@ -225,6 +279,58 @@ async def job_status(job_id: str):
         return {"status": "error", "error": job.get("error", "Unknown error")}
 
     return {"status": "processing"}
+
+
+@app.post("/jpg-to-pdf")
+async def jpg_to_pdf(
+    files: List[UploadFile] = File(...),
+    level: str = Form("screen"),
+):
+    """
+    Accept multiple images (in desired order), combine into PDF, compress.
+    Returns job_id immediately — same polling pattern as /compress.
+    """
+    _prune_old_jobs()
+
+    if not level.startswith("/"):
+        level = f"/{level}"
+    if level not in VALID_LEVELS:
+        raise HTTPException(status_code=400, detail=f"Invalid compression level: {level}")
+
+    ALLOWED = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff", ".tif"}
+    for f in files:
+        ext = os.path.splitext(f.filename or "")[1].lower()
+        if ext not in ALLOWED:
+            raise HTTPException(status_code=400, detail=f"Unsupported file type: {f.filename}")
+
+    job_id   = str(uuid.uuid4())
+    tmp_dir  = tempfile.mkdtemp()
+    out_path = os.path.join(tmp_dir, "output.pdf")
+
+    # Save all uploaded images preserving order
+    image_paths: list[str] = []
+    for i, upload in enumerate(files):
+        ext  = os.path.splitext(upload.filename or "")[1].lower() or ".jpg"
+        path = os.path.join(tmp_dir, f"img_{i:04d}{ext}")
+        content = await upload.read()
+        with open(path, "wb") as fp:
+            fp.write(content)
+        image_paths.append(path)
+
+    with _jobs_lock:
+        _jobs[job_id] = {
+            "status":     "processing",
+            "tmp_dir":    tmp_dir,
+            "created_at": time.time(),
+        }
+
+    threading.Thread(
+        target=_run_jpg_to_pdf,
+        args=(job_id, image_paths, out_path, level, tmp_dir),
+        daemon=True,
+    ).start()
+
+    return JSONResponse({"job_id": job_id})
 
 
 @app.get("/download/{job_id}")

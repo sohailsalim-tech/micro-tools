@@ -6,8 +6,8 @@ import './globals.css'
 const inter = Inter({ variable: '--font-inter', subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'OPUS PDF Compressor - Free & Instant',
-  description: 'Compress PDF files up to 90% for free. Fast, secure, and works on all browsers. By Astral Hatch Technologies.',
+  title: 'OPUS PDF Tools — Free PDF Tools Online',
+  description: 'Free online PDF tools — compress, convert, merge, split and more. Fast, secure, no signup required. By Astral Hatch Technologies.',
   generator: 'v0.app',
   icons: {
     icon: '/favicon.png',
