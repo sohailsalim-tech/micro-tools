@@ -88,7 +88,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="max-w-5xl mx-auto px-4 pt-14 pb-10 text-center">
         <h1 className="text-3xl sm:text-5xl font-bold text-foreground tracking-tight mb-3">
-          All the PDF tools<br className="hidden sm:block" /> you&apos;ll ever need
+          All the PDF tools{" "}<br className="hidden sm:block" />you&apos;ll ever need
         </h1>
         <p className="text-muted-foreground text-base sm:text-lg max-w-xl mx-auto">
           Free. Fast. No signup required. Every tool works right in your browser.
