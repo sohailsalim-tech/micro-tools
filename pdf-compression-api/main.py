@@ -11,6 +11,7 @@ import threading
 import time
 from typing import List
 from PIL import Image
+from pypdf import PdfWriter
 
 app = FastAPI(title="OPUS PDF Compressor API")
 
@@ -210,6 +211,31 @@ def _run_jpg_to_pdf(job_id: str, image_paths: list[str], output_path: str, level
             _jobs[job_id].update({"status": "error", "error": str(e)})
 
 
+def _run_merge_pdf(job_id: str, pdf_paths: list[str], output_path: str, tmp_dir: str):
+    """Background thread: merge PDFs in order using pypdf."""
+    try:
+        writer = PdfWriter()
+        for path in pdf_paths:
+            writer.append(path)
+        with open(output_path, "wb") as f:
+            writer.write(f)
+        writer.close()
+
+        total_input = sum(os.path.getsize(p) for p in pdf_paths)
+        output_size = os.path.getsize(output_path)
+
+        with _jobs_lock:
+            _jobs[job_id].update({
+                "status":      "done",
+                "serve_path":  output_path,
+                "input_size":  total_input,
+                "output_size": output_size,
+            })
+    except Exception as e:
+        with _jobs_lock:
+            _jobs[job_id].update({"status": "error", "error": str(e)})
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
@@ -279,6 +305,47 @@ async def job_status(job_id: str):
         return {"status": "error", "error": job.get("error", "Unknown error")}
 
     return {"status": "processing"}
+
+
+@app.post("/merge-pdf")
+async def merge_pdf(files: List[UploadFile] = File(...)):
+    """Accept multiple PDFs in order, merge them, return job_id."""
+    _prune_old_jobs()
+
+    if len(files) < 2:
+        raise HTTPException(status_code=400, detail="Please upload at least 2 PDF files to merge")
+
+    for f in files:
+        fname = (f.filename or "").lower()
+        if not fname.endswith(".pdf"):
+            raise HTTPException(status_code=400, detail=f"Only PDF files accepted: {f.filename}")
+
+    job_id    = str(uuid.uuid4())
+    tmp_dir   = tempfile.mkdtemp()
+    out_path  = os.path.join(tmp_dir, "merged.pdf")
+
+    pdf_paths: list[str] = []
+    for i, upload in enumerate(files):
+        path = os.path.join(tmp_dir, f"doc_{i:04d}.pdf")
+        content = await upload.read()
+        with open(path, "wb") as fp:
+            fp.write(content)
+        pdf_paths.append(path)
+
+    with _jobs_lock:
+        _jobs[job_id] = {
+            "status":     "processing",
+            "tmp_dir":    tmp_dir,
+            "created_at": time.time(),
+        }
+
+    threading.Thread(
+        target=_run_merge_pdf,
+        args=(job_id, pdf_paths, out_path, tmp_dir),
+        daemon=True,
+    ).start()
+
+    return JSONResponse({"job_id": job_id})
 
 
 @app.post("/jpg-to-pdf")

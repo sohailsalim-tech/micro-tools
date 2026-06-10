@@ -24,11 +24,11 @@ const tools = [
     badgeColor: "bg-violet-500",
   },
   {
-    href: "#",
+    href: "/merge",
     emoji: "🔗",
     title: "Merge PDF",
     description: "Combine multiple PDF files into one document.",
-    badge: "SOON",
+    badge: "NEW",
     color: "from-emerald-500/10 to-teal-500/10",
     border: "hover:border-emerald-400",
     badgeColor: "bg-emerald-500",
