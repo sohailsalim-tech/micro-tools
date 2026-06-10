@@ -72,8 +72,8 @@ export default function HomePage() {
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Image src="/opus-logo.png" alt="OPUS" width={36} height={36} />
-            <span className="font-bold text-lg text-foreground tracking-tight">OPUS PDF Tools</span>
+            <Image src="/opus-logo.png" alt="TecPDF" width={36} height={36} />
+            <span className="font-bold text-lg text-foreground tracking-tight">TecPDF</span>
           </div>
           <ThemeToggle />
         </div>
@@ -129,7 +129,7 @@ export default function HomePage() {
       <section className="border-t border-border bg-card/50">
         <div className="max-w-5xl mx-auto px-4 py-6 flex flex-wrap items-center justify-center gap-6 text-xs sm:text-sm text-muted-foreground">
           <span className="flex items-center gap-1.5">🔒 Files never stored</span>
-          <span className="flex items-center gap-1.5">⚡ Powered by Astral Tech</span>
+          <span className="flex items-center gap-1.5">⚡ Fast &amp; reliable</span>
           <span className="flex items-center gap-1.5">🆓 Always free</span>
           <span className="flex items-center gap-1.5">🌍 Works on all devices</span>
         </div>

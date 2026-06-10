@@ -20,6 +20,8 @@ app = FastAPI(title="OPUS PDF Compressor API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://tecpdf.com",
+        "https://www.tecpdf.com",
         "https://micro-tools-eosin.vercel.app",
         "http://localhost:3000",
         "http://localhost:3001",
