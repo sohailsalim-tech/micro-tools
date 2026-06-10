@@ -34,11 +34,11 @@ const tools = [
     badgeColor: "bg-emerald-500",
   },
   {
-    href: "#",
+    href: "/split",
     emoji: "✂️",
     title: "Split PDF",
     description: "Extract pages or split a PDF into multiple files.",
-    badge: "SOON",
+    badge: "NEW",
     color: "from-orange-500/10 to-amber-500/10",
     border: "hover:border-orange-400",
     badgeColor: "bg-orange-500",

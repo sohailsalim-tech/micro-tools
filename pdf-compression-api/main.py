@@ -11,7 +11,9 @@ import threading
 import time
 from typing import List
 from PIL import Image
-from pypdf import PdfWriter
+from pypdf import PdfWriter, PdfReader
+import zipfile
+import io
 
 app = FastAPI(title="OPUS PDF Compressor API")
 
@@ -236,6 +238,104 @@ def _run_merge_pdf(job_id: str, pdf_paths: list[str], output_path: str, tmp_dir:
             _jobs[job_id].update({"status": "error", "error": str(e)})
 
 
+# ---------------------------------------------------------------------------
+# Split PDF helpers
+# ---------------------------------------------------------------------------
+
+def _parse_page_list(spec: str, total_pages: int) -> list[int]:
+    """Parse a page spec like "1, 3, 5-8" into a sorted list of 1-based page numbers."""
+    pages: set[int] = set()
+    for part in spec.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "-" in part:
+            halves = part.split("-", 1)
+            s = int(halves[0].strip()) if halves[0].strip() else 1
+            e = int(halves[1].strip()) if halves[1].strip() else total_pages
+            pages.update(range(s, e + 1))
+        else:
+            pages.add(int(part))
+    return sorted(p for p in pages if 1 <= p <= total_pages)
+
+
+def _run_split_pdf(job_id: str, pdf_path: str, mode: str, spec: str, tmp_dir: str):
+    """Background thread: split PDF by mode (extract | ranges | all)."""
+    try:
+        reader     = PdfReader(pdf_path)
+        total      = len(reader.pages)
+        input_size = os.path.getsize(pdf_path)
+
+        if mode == "extract":
+            # Produce a single PDF with the requested pages
+            pages  = _parse_page_list(spec, total) if spec.strip() else list(range(1, total + 1))
+            writer = PdfWriter()
+            for p in pages:
+                writer.add_page(reader.pages[p - 1])
+            out_path = os.path.join(tmp_dir, "extracted.pdf")
+            with open(out_path, "wb") as f:
+                writer.write(f)
+            writer.close()
+            with _jobs_lock:
+                _jobs[job_id].update({
+                    "status": "done", "serve_path": out_path,
+                    "input_size": input_size, "output_size": os.path.getsize(out_path),
+                    "output_filename": "extracted.pdf",
+                    "output_content_type": "application/pdf",
+                })
+
+        elif mode == "ranges":
+            # spec = "1-5; 6-10; 11-" — each semicolon-separated chunk → one PDF in ZIP
+            parts    = [p.strip() for p in spec.split(";") if p.strip()]
+            zip_path = os.path.join(tmp_dir, "split_parts.zip")
+            with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+                for i, part_spec in enumerate(parts):
+                    pages  = _parse_page_list(part_spec, total)
+                    writer = PdfWriter()
+                    for p in pages:
+                        writer.add_page(reader.pages[p - 1])
+                    part_path = os.path.join(tmp_dir, f"part_{i + 1:02d}.pdf")
+                    with open(part_path, "wb") as fp:
+                        writer.write(fp)
+                    writer.close()
+                    zf.write(part_path, f"part_{i + 1:02d}.pdf")
+            with _jobs_lock:
+                _jobs[job_id].update({
+                    "status": "done", "serve_path": zip_path,
+                    "input_size": input_size, "output_size": os.path.getsize(zip_path),
+                    "output_filename": "split_parts.zip",
+                    "output_content_type": "application/zip",
+                })
+
+        elif mode == "all":
+            # Every page becomes its own PDF, bundled in a ZIP
+            zip_path = os.path.join(tmp_dir, "split_pages.zip")
+            with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+                for i, page in enumerate(reader.pages):
+                    writer    = PdfWriter()
+                    writer.add_page(page)
+                    page_path = os.path.join(tmp_dir, f"page_{i + 1:04d}.pdf")
+                    with open(page_path, "wb") as fp:
+                        writer.write(fp)
+                    writer.close()
+                    zf.write(page_path, f"page_{i + 1:04d}.pdf")
+            with _jobs_lock:
+                _jobs[job_id].update({
+                    "status": "done", "serve_path": zip_path,
+                    "input_size": input_size, "output_size": os.path.getsize(zip_path),
+                    "output_filename": "split_pages.zip",
+                    "output_content_type": "application/zip",
+                })
+
+        else:
+            with _jobs_lock:
+                _jobs[job_id].update({"status": "error", "error": f"Unknown mode: {mode}"})
+
+    except Exception as e:
+        with _jobs_lock:
+            _jobs[job_id].update({"status": "error", "error": str(e)})
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
@@ -400,9 +500,65 @@ async def jpg_to_pdf(
     return JSONResponse({"job_id": job_id})
 
 
+@app.post("/pdf-info")
+async def pdf_info(file: UploadFile = File(...)):
+    """Return page count without storing anything — fast, synchronous."""
+    content = await file.read()
+    try:
+        reader = PdfReader(io.BytesIO(content))
+        return {"page_count": len(reader.pages)}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not read PDF: {e}")
+
+
+@app.post("/split-pdf")
+async def split_pdf(
+    file: UploadFile = File(...),
+    mode: str = Form("extract"),
+    spec: str = Form(""),
+):
+    """
+    Split a PDF.
+    mode=extract  spec="1, 3, 5-8"          → extracted.pdf
+    mode=ranges   spec="1-5; 6-10; 11-15"   → split_parts.zip
+    mode=all                                 → split_pages.zip (one page each)
+    """
+    _prune_old_jobs()
+
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+
+    VALID_MODES = {"extract", "ranges", "all"}
+    if mode not in VALID_MODES:
+        raise HTTPException(status_code=400, detail=f"Invalid mode: {mode}")
+
+    content  = await file.read()
+    job_id   = str(uuid.uuid4())
+    tmp_dir  = tempfile.mkdtemp()
+    in_path  = os.path.join(tmp_dir, "input.pdf")
+
+    with open(in_path, "wb") as f:
+        f.write(content)
+
+    with _jobs_lock:
+        _jobs[job_id] = {
+            "status":     "processing",
+            "tmp_dir":    tmp_dir,
+            "created_at": time.time(),
+        }
+
+    threading.Thread(
+        target=_run_split_pdf,
+        args=(job_id, in_path, mode, spec, tmp_dir),
+        daemon=True,
+    ).start()
+
+    return JSONResponse({"job_id": job_id})
+
+
 @app.get("/download/{job_id}")
 async def download(job_id: str):
-    """Download the compressed file. Cleans up temp dir after sending."""
+    """Download the result file. Cleans up temp dir after sending."""
     with _jobs_lock:
         job = _jobs.get(job_id)
 
@@ -411,10 +567,12 @@ async def download(job_id: str):
     if job["status"] != "done":
         raise HTTPException(status_code=409, detail="Job not ready")
 
-    serve_path  = job["serve_path"]
-    tmp_dir     = job["tmp_dir"]
-    input_size  = job["input_size"]
-    output_size = job["output_size"]
+    serve_path   = job["serve_path"]
+    tmp_dir      = job["tmp_dir"]
+    input_size   = job["input_size"]
+    output_size  = job["output_size"]
+    out_filename = job.get("output_filename", "compressed.pdf")
+    out_media    = job.get("output_content_type", "application/pdf")
 
     def cleanup():
         with _jobs_lock:
@@ -423,8 +581,8 @@ async def download(job_id: str):
 
     return FileResponse(
         serve_path,
-        media_type="application/pdf",
-        filename="compressed.pdf",
+        media_type=out_media,
+        filename=out_filename,
         background=BackgroundTask(cleanup),
         headers={
             "X-Original-Size":               str(input_size),
