@@ -163,53 +163,77 @@ export function PDFCompressor() {
     setProgress(0);
     setErrorMessage(null);
 
-    // Animate progress to ~85% while waiting for the API response
-    let currentProgress = 0;
-    const progressTimer = setInterval(() => {
-      currentProgress += 1;
-      if (currentProgress >= 85) {
-        clearInterval(progressTimer);
-        setProgress(85);
-      } else {
-        setProgress(currentProgress);
-      }
-    }, 60);
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     try {
+      // ── Phase 1: Upload (snaps to 20% once server acknowledges) ──
       const formData = new FormData();
       formData.append("file", file);
       formData.append("level", compressionLevel);
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const response = await fetch(`${apiUrl}/compress`, {
+      const uploadRes = await fetch(`${apiUrl}/compress`, {
         method: "POST",
         body: formData,
       });
 
-      clearInterval(progressTimer);
-
-      if (!response.ok) {
-        const errorText = await response.text().catch(() => "Unknown error");
+      if (!uploadRes.ok) {
+        const errorText = await uploadRes.text().catch(() => "Unknown error");
         throw new Error(errorText);
       }
 
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
+      const { job_id } = await uploadRes.json();
+      setProgress(20);
 
-      // Prefer the server-reported sizes (accurate even when fallback to original)
-      const serverOriginal  = Number(response.headers.get("X-Original-Size"))   || file.size;
-      const serverCompressed = Number(response.headers.get("X-Compressed-Size")) || blob.size;
+      // ── Phase 2: Poll until Ghostscript finishes (20 → 85%) ──
+      let pollProgress = 20;
+      const pollTick = setInterval(() => {
+        pollProgress = Math.min(pollProgress + 0.4, 84);
+        setProgress(Math.round(pollProgress));
+      }, 1000);
+
+      let inputSize  = 0;
+      let outputSize = 0;
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        await new Promise<void>((r) => setTimeout(r, 1500));
+
+        const statusRes = await fetch(`${apiUrl}/job/${job_id}`);
+        if (!statusRes.ok) throw new Error("Failed to check job status");
+        const statusData = await statusRes.json();
+
+        if (statusData.status === "done") {
+          inputSize  = statusData.input_size;
+          outputSize = statusData.output_size;
+          break;
+        }
+        if (statusData.status === "error") {
+          clearInterval(pollTick);
+          throw new Error(statusData.error || "Compression failed");
+        }
+        // still processing — keep polling
+      }
+
+      clearInterval(pollTick);
+      setProgress(90);
+
+      // ── Phase 3: Download the result (90 → 100%) ──
+      const downloadRes = await fetch(`${apiUrl}/download/${job_id}`);
+      if (!downloadRes.ok) throw new Error("Download failed");
+
+      const blob = await downloadRes.blob();
+      const url  = URL.createObjectURL(blob);
 
       setProgress(100);
       setCompressedFileUrl(url);
       setResult({
-        originalSize:   serverOriginal,
-        compressedSize: serverCompressed,
-        reduction: ((serverOriginal - serverCompressed) / serverOriginal) * 100,
+        originalSize:   inputSize,
+        compressedSize: outputSize,
+        reduction: ((inputSize - outputSize) / inputSize) * 100,
       });
       setStatus("complete");
+
     } catch (err) {
-      clearInterval(progressTimer);
       setProgress(0);
       setStatus("selected");
       setErrorMessage(
@@ -384,7 +408,11 @@ export function PDFCompressor() {
             <div className="mt-4 sm:mt-6 animate-in fade-in duration-300">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm font-medium text-foreground">
-                  Compressing...
+                  {progress < 20
+                    ? "Uploading…"
+                    : progress >= 90
+                    ? "Downloading…"
+                    : "Compressing…"}
                 </span>
                 <span className="text-xs sm:text-sm font-medium text-primary">
                   {Math.round(progress)}%
@@ -392,7 +420,7 @@ export function PDFCompressor() {
               </div>
               <div className="h-3 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-primary rounded-full transition-all duration-100 ease-out"
+                  className="h-full bg-primary rounded-full transition-all duration-300 ease-out"
                   style={{ width: `${progress}%` }}
                 />
               </div>
