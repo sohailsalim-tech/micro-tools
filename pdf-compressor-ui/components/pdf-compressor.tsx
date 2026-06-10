@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import Image from "next/image";
 
 type CompressionLevel = "screen" | "ebook" | "printer" | "prepress";
-type Status = "idle" | "selected" | "compressing" | "complete";
+type Status = "idle" | "selected" | "compressing" | "complete" | "error";
 
 interface CompressionResult {
   originalSize: number;
@@ -90,24 +91,16 @@ function ShieldIcon({ className }: { className?: string }) {
   );
 }
 
-function GlobeIcon({ className }: { className?: string }) {
+function OpusLogo({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"
-      />
-    </svg>
+    <Image src="/opus-logo.png" alt="OPUS" width={64} height={64} className={className} />
   );
 }
 
-function OpusLogo({ className }: { className?: string }) {
-  return <div className={className}>OPUS</div>;
-}
-
 function AstralTechIcon({ className }: { className?: string }) {
-  return <div className={className}>AT</div>;
+  return (
+    <Image src="/astral-tech-logo.png" alt="Astral Tech" width={20} height={20} className={className} />
+  );
 }
 
 export function PDFCompressor() {
@@ -117,6 +110,8 @@ export function PDFCompressor() {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<CompressionResult | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [compressedFileUrl, setCompressedFileUrl] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = useCallback((selectedFile: File | null) => {
@@ -125,8 +120,13 @@ export function PDFCompressor() {
       setStatus("selected");
       setResult(null);
       setProgress(0);
+      setErrorMessage(null);
+      if (compressedFileUrl) {
+        URL.revokeObjectURL(compressedFileUrl);
+        setCompressedFileUrl(null);
+      }
     }
-  }, []);
+  }, [compressedFileUrl]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -156,57 +156,86 @@ export function PDFCompressor() {
     [handleFileSelect]
   );
 
-  const simulateCompression = useCallback(() => {
+  const handleCompress = useCallback(async () => {
     if (!file) return;
 
     setStatus("compressing");
     setProgress(0);
+    setErrorMessage(null);
 
-    const reductionRates: Record<CompressionLevel, number> = {
-      screen: 0.85,
-      ebook: 0.65,
-      printer: 0.35,
-      prepress: 0.1,
-    };
-
-    const duration = 2500;
-    const interval = 50;
-    const steps = duration / interval;
-    let currentStep = 0;
-
-    const timer = setInterval(() => {
-      currentStep++;
-      const newProgress = Math.min((currentStep / steps) * 100, 100);
-      setProgress(newProgress);
-
-      if (currentStep >= steps) {
-        clearInterval(timer);
-        const reduction = reductionRates[compressionLevel];
-        const compressedSize = file.size * (1 - reduction);
-        setResult({
-          originalSize: file.size,
-          compressedSize,
-          reduction: reduction * 100,
-        });
-        setStatus("complete");
+    // Animate progress to ~85% while waiting for the API response
+    let currentProgress = 0;
+    const progressTimer = setInterval(() => {
+      currentProgress += 1;
+      if (currentProgress >= 85) {
+        clearInterval(progressTimer);
+        setProgress(85);
+      } else {
+        setProgress(currentProgress);
       }
-    }, interval);
+    }, 60);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("level", compressionLevel);
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const response = await fetch(`${apiUrl}/compress`, {
+        method: "POST",
+        body: formData,
+      });
+
+      clearInterval(progressTimer);
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "Unknown error");
+        throw new Error(errorText);
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      setProgress(100);
+      setCompressedFileUrl(url);
+      setResult({
+        originalSize: file.size,
+        compressedSize: blob.size,
+        reduction: ((file.size - blob.size) / file.size) * 100,
+      });
+      setStatus("complete");
+    } catch (err) {
+      clearInterval(progressTimer);
+      setProgress(0);
+      setStatus("selected");
+      setErrorMessage(
+        err instanceof Error ? err.message : "Compression failed. Please try again."
+      );
+    }
   }, [file, compressionLevel]);
 
   const handleReset = useCallback(() => {
+    if (compressedFileUrl) {
+      URL.revokeObjectURL(compressedFileUrl);
+    }
     setFile(null);
     setStatus("idle");
     setProgress(0);
     setResult(null);
+    setCompressedFileUrl(null);
+    setErrorMessage(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  }, []);
+  }, [compressedFileUrl]);
 
   const handleDownload = useCallback(() => {
-    // Simulate download - in real app, this would download the compressed file
-    alert("In a real application, this would download your compressed PDF!");
-  }, []);
+    if (!compressedFileUrl) return;
+    const a = document.createElement("a");
+    a.href = compressedFileUrl;
+    a.download = file ? `compressed_${file.name}` : "compressed.pdf";
+    a.click();
+  }, [compressedFileUrl, file]);
 
   return (
     <main className="min-h-screen bg-background py-4 px-3 sm:py-16 sm:px-4">
@@ -231,7 +260,7 @@ export function PDFCompressor() {
           {/* Upload Area */}
           {status !== "complete" && (
             <div
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => status !== "compressing" && fileInputRef.current?.click()}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -242,7 +271,7 @@ export function PDFCompressor() {
                   ? "border-primary bg-primary/5 scale-[1.02]"
                   : "border-primary/40 hover:border-primary hover:bg-primary/5"
                 }
-                ${status === "compressing" ? "pointer-events-none opacity-50" : ""}
+                ${status === "compressing" ? "pointer-events-none opacity-50 cursor-default" : ""}
               `}
             >
               <input
@@ -252,7 +281,7 @@ export function PDFCompressor() {
                 onChange={handleInputChange}
                 className="sr-only"
               />
-              
+
               {file ? (
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -280,6 +309,13 @@ export function PDFCompressor() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Error message */}
+          {errorMessage && (
+            <div className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+              <p className="text-xs sm:text-sm text-destructive">{errorMessage}</p>
             </div>
           )}
 
@@ -328,7 +364,7 @@ export function PDFCompressor() {
           {/* Compress Button */}
           {status === "selected" && (
             <button
-              onClick={simulateCompression}
+              onClick={handleCompress}
               className="
                 w-full mt-4 sm:mt-6 py-3 sm:py-3.5 px-6 rounded-lg font-semibold text-sm sm:text-base text-primary-foreground
                 bg-primary hover:bg-primary/90 active:scale-[0.98]
