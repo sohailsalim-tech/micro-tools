@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShareBar } from "@/components/share-bar";
+import { useWittyMessages } from "@/hooks/use-witty-messages";
 
 type Status = "idle" | "selected" | "compressing" | "complete";
 
@@ -41,6 +42,15 @@ export function JpgToPdf() {
   const [isDragging, setIsDragging]   = useState(false);
   const [dragOverId, setDragOverId]   = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const wittyMsg = useWittyMessages([
+    "Convincing images to become a PDF…",
+    "Teaching JPGs to speak PDF…",
+    "Binding your photos into a book…",
+    "Arranging the photo album…",
+    "Giving your images a PDF passport…",
+    "Almost ready for printing…",
+    "Stitching pages together…",
+  ], status === "compressing");
   const dragSrcId    = useRef<string | null>(null);
 
   // ── File selection ──────────────────────────────────────────────
@@ -324,7 +334,7 @@ export function JpgToPdf() {
             <div className="mt-4 animate-in fade-in duration-300">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-foreground">
-                  {progress < 20 ? "Uploading…" : progress >= 90 ? "Downloading…" : "Creating PDF…"}
+                  {progress < 20 ? "Uploading…" : progress >= 90 ? "Preparing download…" : wittyMsg}
                 </span>
                 <span className="text-xs font-medium text-violet-500">{Math.round(progress)}%</span>
               </div>

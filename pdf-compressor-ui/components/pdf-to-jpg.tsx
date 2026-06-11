@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShareBar } from "@/components/share-bar";
+import { useWittyMessages } from "@/hooks/use-witty-messages";
 
 type Status = "idle" | "info_loading" | "ready" | "converting" | "complete";
 type Quality = "standard" | "high" | "max";
@@ -36,6 +37,15 @@ export function PdfToJpg() {
   const [errorMsg, setErrorMsg]         = useState<string | null>(null);
   const [isDragging, setIsDragging]     = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const wittyMsg = useWittyMessages([
+    "Liberating pages from the PDF prison…",
+    "Painting each page pixel by pixel…",
+    "Teaching the PDF to become an artist…",
+    "Rendering pages with care…",
+    "Developing the digital photos…",
+    "Snapping each page like a pro…",
+    "Almost ready for the gallery…",
+  ], status === "converting");
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -289,7 +299,7 @@ export function PdfToJpg() {
                 <div className="animate-in fade-in duration-300">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-foreground">
-                      {progress < 20 ? "Uploading…" : progress >= 90 ? "Downloading…" : "Rendering pages…"}
+                      {progress < 20 ? "Uploading…" : progress >= 90 ? "Preparing download…" : wittyMsg}
                     </span>
                     <span className="text-xs font-medium text-rose-500">{Math.round(progress)}%</span>
                   </div>

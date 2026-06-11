@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShareBar } from "@/components/share-bar";
+import { useWittyMessages } from "@/hooks/use-witty-messages";
 
 type Status = "idle" | "selected" | "merging" | "complete";
 
@@ -31,6 +32,15 @@ export function MergePdf() {
   const [isDragging, setIsDragging]   = useState(false);
   const [dragOverId, setDragOverId]   = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const wittyMsg = useWittyMessages([
+    "Introducing the PDFs to each other…",
+    "Building bridges between documents…",
+    "Convincing pages to become one big family…",
+    "Stapling things digitally…",
+    "Performing a document wedding…",
+    "Merging timelines…",
+    "Almost one happy PDF…",
+  ], status === "merging");
   const dragSrcId    = useRef<string | null>(null);
 
   // ── File selection ──────────────────────────────────────────────
@@ -293,7 +303,7 @@ export function MergePdf() {
             <div className="mt-4 animate-in fade-in duration-300">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-medium text-foreground">
-                  {progress < 25 ? "Uploading…" : progress >= 90 ? "Downloading…" : "Merging PDFs…"}
+                  {progress < 25 ? "Uploading…" : progress >= 90 ? "Preparing download…" : wittyMsg}
                 </span>
                 <span className="text-xs font-medium text-emerald-500">{Math.round(progress)}%</span>
               </div>

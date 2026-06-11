@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShareBar } from "@/components/share-bar";
+import { useWittyMessages } from "@/hooks/use-witty-messages";
 
 type CompressionLevel = "screen" | "ebook" | "printer" | "prepress";
 type Status = "idle" | "selected" | "compressing" | "complete" | "error";
@@ -116,6 +117,16 @@ export function PDFCompressor() {
   const [compressedFileUrl, setCompressedFileUrl] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const wittyMsg = useWittyMessages([
+    "Convincing your PDF to go on a diet…",
+    "Squeezing pixels into submission…",
+    "Negotiating with bytes…",
+    "Removing unnecessary calories…",
+    "Teaching the PDF to travel light…",
+    "Applying digital liposuction…",
+    "Making it fit into those jeans…",
+    "Almost done — holding our breath…",
+  ], status === "compressing");
 
   const handleFileSelect = useCallback((selectedFile: File | null) => {
     if (selectedFile && selectedFile.type === "application/pdf") {
@@ -417,11 +428,7 @@ export function PDFCompressor() {
             <div className="mt-4 sm:mt-6 animate-in fade-in duration-300">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm font-medium text-foreground">
-                  {progress < 20
-                    ? "Uploading…"
-                    : progress >= 90
-                    ? "Downloading…"
-                    : "Compressing…"}
+                  {progress < 20 ? "Uploading…" : progress >= 90 ? "Preparing download…" : wittyMsg}
                 </span>
                 <span className="text-xs sm:text-sm font-medium text-primary">
                   {Math.round(progress)}%

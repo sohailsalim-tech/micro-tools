@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShareBar } from "@/components/share-bar";
+import { useWittyMessages } from "@/hooks/use-witty-messages";
 
 type Status = "idle" | "ready" | "protecting" | "complete";
 
@@ -54,6 +55,15 @@ export function ProtectPdf() {
   const [errorMsg, setErrorMsg]     = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const wittyMsg = useWittyMessages([
+    "Installing a digital lock…",
+    "Building walls around your PDF…",
+    "Teaching it to say no to strangers…",
+    "Encrypting with military precision…",
+    "Sealing the vault…",
+    "Posting a security guard at the door…",
+    "Almost locked and loaded…",
+  ], status === "protecting");
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -316,7 +326,7 @@ export function ProtectPdf() {
                 <div className="animate-in fade-in duration-300">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-foreground">
-                      {progress < 30 ? "Uploading…" : progress >= 90 ? "Downloading…" : "Encrypting…"}
+                      {progress < 30 ? "Uploading…" : progress >= 90 ? "Preparing download…" : wittyMsg}
                     </span>
                     <span className="text-xs font-medium text-sky-500">{Math.round(progress)}%</span>
                   </div>

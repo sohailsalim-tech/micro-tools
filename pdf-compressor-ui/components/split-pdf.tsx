@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShareBar } from "@/components/share-bar";
+import { useWittyMessages } from "@/hooks/use-witty-messages";
 
 type Status = "idle" | "info_loading" | "ready" | "splitting" | "complete";
 type Mode = "extract" | "ranges" | "all";
@@ -51,6 +52,15 @@ export function SplitPdf() {
   const [errorMsg, setErrorMsg]           = useState<string | null>(null);
   const [isDragging, setIsDragging]       = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const wittyMsg = useWittyMessages([
+    "Performing precision page surgery…",
+    "Carefully cutting along the dotted line…",
+    "Separating pages like a pro…",
+    "Giving each page its independence…",
+    "Slicing and dicing digitally…",
+    "Teaching pages to stand on their own…",
+    "Almost done splitting…",
+  ], status === "splitting");
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -350,7 +360,7 @@ export function SplitPdf() {
                 <div className="animate-in fade-in duration-300">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-foreground">
-                      {progress < 25 ? "Uploading…" : progress >= 90 ? "Downloading…" : "Splitting…"}
+                      {progress < 25 ? "Uploading…" : progress >= 90 ? "Preparing download…" : wittyMsg}
                     </span>
                     <span className="text-xs font-medium text-orange-500">{Math.round(progress)}%</span>
                   </div>
