@@ -62,6 +62,13 @@ export default function RootLayout({
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-SVQP1NN76T" />}
+        {process.env.NODE_ENV === 'production' && (
+          <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8099003900260030"
+            crossOrigin="anonymous"
+          />
+        )}
       </body>
     </html>
   )
