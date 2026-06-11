@@ -125,8 +125,40 @@ export function PDFCompressor() {
     "Teaching the PDF to travel light…",
     "Applying digital liposuction…",
     "Making it fit into those jeans…",
-    "Almost done — holding our breath…",
-  ], status === "compressing");
+    "Telling redundant data to pack its bags…",
+    "Asking pixels to share rooms…",
+    "Compressing like there's no tomorrow…",
+    "Filing down the rough edges…",
+    "Every byte counts — trimming the fat…",
+    "Your PDF is sweating it out at the gym…",
+    "Performing document yoga…",
+    "Shrinking it smaller than your inbox…",
+    "Packing everything into a tiny suitcase…",
+    "The PDF is almost beach-body ready…",
+    "Evicting duplicate data from the premises…",
+    "Running a byte reduction marathon…",
+    "Convincing fonts to stop hogging space…",
+    "Politely asking images to step aside…",
+    "Optimising like a Swiss engineer…",
+    "Putting the PDF through boot camp…",
+    "Whispering sweet nothings to the compressor…",
+    "Making pixels uncomfortable so they leave…",
+    "Your document is getting a serious makeover…",
+    "Applying extreme couponing to file size…",
+    "Removing pixels that nobody asked for…",
+    "Running a background audit on every byte…",
+    "The PDF is almost unrecognisably slim…",
+    "Trimming white space like a bonsai master…",
+    "Hunting down bloated metadata…",
+    "The server is doing its very best…",
+    "Fewer bytes, same information — magic!",
+    "Doing what email attachments only dream of…",
+    "Pushing data through a very small hole…",
+    "Your patience is greatly appreciated…",
+    "Good things take time — great files take more…",
+    "Still here, still squeezing…",
+    "The finish line is closer than it feels…",
+  ], status === "compressing", 3000);
 
   const handleFileSelect = useCallback((selectedFile: File | null) => {
     if (selectedFile && selectedFile.type === "application/pdf") {
@@ -428,7 +460,7 @@ export function PDFCompressor() {
             <div className="mt-4 sm:mt-6 animate-in fade-in duration-300">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm font-medium text-foreground">
-                  {progress < 20 ? "Uploading…" : progress >= 90 ? "Preparing download…" : wittyMsg}
+                  {progress < 20 ? "Uploading…" : wittyMsg}
                 </span>
                 <span className="text-xs sm:text-sm font-medium text-primary">
                   {Math.round(progress)}%
