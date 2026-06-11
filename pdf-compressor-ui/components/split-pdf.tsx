@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ShareBar } from "@/components/share-bar";
 
 type Status = "idle" | "info_loading" | "ready" | "splitting" | "complete";
 type Mode = "extract" | "ranges" | "all";
@@ -392,6 +393,7 @@ export function SplitPdf() {
                   Split another PDF
                 </button>
               </div>
+              <ShareBar toolUrl="/split" toolName="Split PDF on OPUS Productivity Tools" />
             </div>
           )}
         </div>

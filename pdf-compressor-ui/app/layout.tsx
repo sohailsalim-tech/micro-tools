@@ -1,5 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import Script from 'next/script'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -63,10 +64,11 @@ export default function RootLayout({
         </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-SVQP1NN76T" />}
         {process.env.NODE_ENV === 'production' && (
-          <script
+          <Script
             async
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8099003900260030"
             crossOrigin="anonymous"
+            strategy="afterInteractive"
           />
         )}
       </body>

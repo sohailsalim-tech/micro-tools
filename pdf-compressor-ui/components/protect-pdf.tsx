@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ShareBar } from "@/components/share-bar";
 
 type Status = "idle" | "ready" | "protecting" | "complete";
 
@@ -358,6 +359,7 @@ export function ProtectPdf() {
                   Protect another PDF
                 </button>
               </div>
+              <ShareBar toolUrl="/protect" toolName="Protect PDF on OPUS Productivity Tools" />
             </div>
           )}
         </div>

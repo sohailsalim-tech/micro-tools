@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ShareBar } from "@/components/share-bar";
 
 type CompressionLevel = "screen" | "ebook" | "printer" | "prepress";
 type Status = "idle" | "selected" | "compressing" | "complete" | "error";
@@ -510,6 +511,7 @@ export function PDFCompressor() {
                   Compress Another
                 </button>
               </div>
+              <ShareBar toolUrl="/compress" toolName="Compress PDF on OPUS Productivity Tools" />
             </div>
           )}
         </div>

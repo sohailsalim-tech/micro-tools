@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ShareBar } from "@/components/share-bar";
 
 type Status = "idle" | "selected" | "compressing" | "complete";
 
@@ -354,6 +355,7 @@ export function JpgToPdf() {
                   Make another
                 </button>
               </div>
+              <ShareBar toolUrl="/jpg-to-pdf" toolName="JPG to PDF on OPUS Productivity Tools" />
             </div>
           )}
         </div>

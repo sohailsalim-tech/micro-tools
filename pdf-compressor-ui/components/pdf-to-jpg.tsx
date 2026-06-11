@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ShareBar } from "@/components/share-bar";
 
 type Status = "idle" | "info_loading" | "ready" | "converting" | "complete";
 type Quality = "standard" | "high" | "max";
@@ -341,6 +342,7 @@ export function PdfToJpg() {
                   Convert another PDF
                 </button>
               </div>
+              <ShareBar toolUrl="/pdf-to-jpg" toolName="PDF to JPG on OPUS Productivity Tools" />
             </div>
           )}
         </div>
