@@ -43,6 +43,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://tecpdf.com",
   },
+  verification: {
+    google: "aTxMspMs2TYxTjrWZmqRWBYEoy5y2MdJ_vosb0BwBMw",
+  },
 }
 
 export default function RootLayout({
