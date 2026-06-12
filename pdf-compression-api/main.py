@@ -36,12 +36,12 @@ VALID_LEVELS = {"/screen", "/ebook", "/printer", "/prepress"}
 LEVEL_PARAMS: dict[str, list[str]] = {
     "/screen": [
         "-dDownsampleColorImages=true",
-        "-dColorImageDownsampleType=/Bicubic",
+        "-dColorImageDownsampleType=/Subsample",  # fastest; acceptable at 72 DPI
         "-dColorImageResolution=72",
         "-dAutoFilterColorImages=false",
         "-dColorImageFilter=/DCTEncode",
         "-dDownsampleGrayImages=true",
-        "-dGrayImageDownsampleType=/Bicubic",
+        "-dGrayImageDownsampleType=/Subsample",
         "-dGrayImageResolution=72",
         "-dAutoFilterGrayImages=false",
         "-dGrayImageFilter=/DCTEncode",
@@ -49,16 +49,16 @@ LEVEL_PARAMS: dict[str, list[str]] = {
         "-dMonoImageResolution=72",
         "-dCompressFonts=true",
         "-dSubsetFonts=true",
-        "-dDetectDuplicateImages=true",
+        # DetectDuplicateImages removed — O(n²) scan, severe slowdown on large files
     ],
     "/ebook": [
         "-dDownsampleColorImages=true",
-        "-dColorImageDownsampleType=/Bicubic",
+        "-dColorImageDownsampleType=/Average",    # ~4x faster than Bicubic, near-identical quality
         "-dColorImageResolution=150",
         "-dAutoFilterColorImages=false",
         "-dColorImageFilter=/DCTEncode",
         "-dDownsampleGrayImages=true",
-        "-dGrayImageDownsampleType=/Bicubic",
+        "-dGrayImageDownsampleType=/Average",
         "-dGrayImageResolution=150",
         "-dAutoFilterGrayImages=false",
         "-dGrayImageFilter=/DCTEncode",
@@ -66,7 +66,7 @@ LEVEL_PARAMS: dict[str, list[str]] = {
         "-dMonoImageResolution=150",
         "-dCompressFonts=true",
         "-dSubsetFonts=true",
-        "-dDetectDuplicateImages=true",
+        # DetectDuplicateImages removed — O(n²) scan, severe slowdown on large files
     ],
     "/printer": [
         "-dDownsampleColorImages=true",

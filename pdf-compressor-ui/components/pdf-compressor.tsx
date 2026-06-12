@@ -158,7 +158,46 @@ export function PDFCompressor() {
     "Good things take time — great files take more…",
     "Still here, still squeezing…",
     "The finish line is closer than it feels…",
-  ], status === "compressing", 3000);
+    "Telling your PDF it has trust issues with whitespace…",
+    "Deploying the shrink ray — stand back…",
+    "Calculating the minimum number of pixels needed for dignity…",
+    "Your file is visiting a compression spa…",
+    "Renegotiating every byte's contract…",
+    "Quietly removing pixels that were just loitering…",
+    "Folding the document like origami…",
+    "Putting the PDF on a juice cleanse…",
+    "Shaking out the digital crumbs…",
+    "Interrogating each layer for redundancy…",
+    "Teaching the file to do more with less…",
+    "Consulting the ancient art of Zip Fu…",
+    "The bytes are being individually counselled…",
+    "Politely evicting the freeloading metadata…",
+    "Your document is having an existential crisis — in a good way…",
+    "Making it lighter than your last email…",
+    "Negotiating a cease-fire between resolution and size…",
+    "Compressing like the deadline was yesterday…",
+    "Applying algorithmic tough love…",
+    "Running a full byte background check…",
+    "Telling pixels to work smarter, not harder…",
+    "The PDF is in therapy, learning to let go…",
+    "Trimming the digital beard one pixel at a time…",
+    "Coaxing the file size downward with jazz hands…",
+    "Our server is flexing its compression muscles…",
+    "Auditing the font collection for overcrowding…",
+    "Removing the bits that were just for show…",
+    "Packing the PDF like a professional traveller…",
+    "Convincing every image it doesn't need that much resolution…",
+    "The compressor is humming a focused little tune…",
+    "Squeezing in the final few bytes…",
+    "Giving the file a slimmer silhouette…",
+    "Filing the paperwork to reduce the paperwork…",
+    "Pixels negotiating severance packages…",
+    "One last squeeze — almost there…",
+    "Checking for stray semicolons hiding kilobytes…",
+    "This PDF will be unrecognisably efficient…",
+    "Wrapping up — the slim version is nearly ready…",
+    "Almost done — resist the urge to refresh…",
+  ], status === "compressing", 7000);
 
   const handleFileSelect = useCallback((selectedFile: File | null) => {
     if (selectedFile && selectedFile.type === "application/pdf") {
@@ -212,22 +251,28 @@ export function PDFCompressor() {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
     try {
-      // ── Phase 1: Upload (snaps to 20% once server acknowledges) ──
+      // ── Phase 1: Upload with real progress (0 → 18%) ──
       const formData = new FormData();
       formData.append("file", file);
       formData.append("level", compressionLevel);
 
-      const uploadRes = await fetch(`${apiUrl}/compress`, {
-        method: "POST",
-        body: formData,
+      const { job_id } = await new Promise<{ job_id: string }>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `${apiUrl}/compress`);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 18));
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(JSON.parse(xhr.responseText));
+          } else {
+            reject(new Error(xhr.responseText || `Upload failed (${xhr.status})`));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Upload failed — check your connection"));
+        xhr.send(formData);
       });
 
-      if (!uploadRes.ok) {
-        const errorText = await uploadRes.text().catch(() => "Unknown error");
-        throw new Error(errorText);
-      }
-
-      const { job_id } = await uploadRes.json();
       setProgress(20);
 
       // ── Phase 2: Poll until Ghostscript finishes (20 → 85%) ──
@@ -242,7 +287,7 @@ export function PDFCompressor() {
 
       // eslint-disable-next-line no-constant-condition
       while (true) {
-        await new Promise<void>((r) => setTimeout(r, 1500));
+        await new Promise<void>((r) => setTimeout(r, 800));
 
         const statusRes = await fetch(`${apiUrl}/job/${job_id}`);
         if (!statusRes.ok) throw new Error("Failed to check job status");
@@ -257,7 +302,6 @@ export function PDFCompressor() {
           clearInterval(pollTick);
           throw new Error(statusData.error || "Compression failed");
         }
-        // still processing — keep polling
       }
 
       clearInterval(pollTick);
@@ -460,7 +504,7 @@ export function PDFCompressor() {
             <div className="mt-4 sm:mt-6 animate-in fade-in duration-300">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm font-medium text-foreground">
-                  {progress < 20 ? "Uploading…" : wittyMsg}
+                  {progress < 20 ? `Uploading… ${progress}%` : wittyMsg}
                 </span>
                 <span className="text-xs sm:text-sm font-medium text-primary">
                   {Math.round(progress)}%
