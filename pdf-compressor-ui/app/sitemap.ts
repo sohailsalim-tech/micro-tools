@@ -12,5 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/pdf-to-jpg`,    lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE}/protect`,       lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE}/word-to-pdf`,   lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE}/excel-to-pdf`,  lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
   ];
 }

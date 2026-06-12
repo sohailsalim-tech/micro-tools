@@ -381,6 +381,40 @@ def _run_word_to_pdf(job_id: str, input_path: str, tmp_dir: str):
             _jobs[job_id].update({"status": "error", "error": str(e)})
 
 
+@app.post("/excel-to-pdf")
+async def excel_to_pdf(file: UploadFile = File(...)):
+    """Accept a .xls or .xlsx file and convert it to PDF via LibreOffice."""
+    _prune_old_jobs()
+
+    filename = (file.filename or "").lower()
+    if not (filename.endswith(".xls") or filename.endswith(".xlsx")):
+        raise HTTPException(status_code=400, detail="Only .xls and .xlsx files are accepted")
+
+    content  = await file.read()
+    job_id   = str(uuid.uuid4())
+    tmp_dir  = tempfile.mkdtemp()
+    ext      = ".xlsx" if filename.endswith(".xlsx") else ".xls"
+    in_path  = os.path.join(tmp_dir, f"input{ext}")
+
+    with open(in_path, "wb") as f:
+        f.write(content)
+
+    with _jobs_lock:
+        _jobs[job_id] = {
+            "status":     "processing",
+            "tmp_dir":    tmp_dir,
+            "created_at": time.time(),
+        }
+
+    threading.Thread(
+        target=_run_word_to_pdf,  # same LibreOffice command works for Excel
+        args=(job_id, in_path, tmp_dir),
+        daemon=True,
+    ).start()
+
+    return JSONResponse({"job_id": job_id})
+
+
 @app.post("/word-to-pdf")
 async def word_to_pdf(file: UploadFile = File(...)):
     """Accept a .doc or .docx file and convert it to PDF via LibreOffice."""

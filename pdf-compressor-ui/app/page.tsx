@@ -73,6 +73,16 @@ const tools = [
     border: "hover:border-blue-400",
     badgeColor: "bg-blue-500",
   },
+  {
+    href: "/excel-to-pdf",
+    emoji: "📊",
+    title: "Excel to PDF",
+    description: "Convert .xls and .xlsx spreadsheets to PDF instantly. Free and accurate.",
+    badge: "NEW",
+    color: "from-green-500/10 to-emerald-500/10",
+    border: "hover:border-green-400",
+    badgeColor: "bg-green-500",
+  },
 ];
 
 export default function HomePage() {
