@@ -3,8 +3,8 @@ import { SplitPdf } from "@/components/split-pdf";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
-  title: "Split PDF – OPUS Productivity Tools",
-  description: "Extract pages or split a PDF into multiple files. Free, fast, no signup.",
+  title: "Split PDF Online Free – Extract Pages from PDF",
+  description: "Split a PDF into multiple files or extract specific pages online for free. Fast, secure, no signup required.",
 };
 
 export default function SplitPage() {

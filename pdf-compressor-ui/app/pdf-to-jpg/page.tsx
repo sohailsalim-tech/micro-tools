@@ -3,8 +3,8 @@ import { PdfToJpg } from "@/components/pdf-to-jpg";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
-  title: "PDF to JPG – OPUS Productivity Tools",
-  description: "Convert every page of a PDF into high-quality JPG images. Free, fast, no signup.",
+  title: "PDF to JPG Online Free – Convert PDF Pages to Images",
+  description: "Convert PDF pages to high-quality JPG images online for free. Download all pages as a ZIP or get a single image. No signup required.",
 };
 
 export default function PdfToJpgPage() {

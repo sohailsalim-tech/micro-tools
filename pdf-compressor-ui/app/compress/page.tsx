@@ -2,8 +2,8 @@ import { PDFCompressor } from "@/components/pdf-compressor";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata = {
-  title: "Compress PDF — OPUS Productivity Tools",
-  description: "Reduce PDF file size by up to 90% for free. Fast, secure, no signup required.",
+  title: "Compress PDF Online Free – Reduce PDF Size Up to 90%",
+  description: "Compress PDF files online for free. Reduce file size by up to 90% without losing quality. No signup, no limits, works on any device.",
 };
 
 export default function CompressPage() {

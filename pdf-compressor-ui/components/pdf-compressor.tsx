@@ -593,6 +593,22 @@ export function PDFCompressor() {
           )}
         </div>
 
+        {/* SEO content */}
+        <section className="mt-8 sm:mt-12 space-y-6 text-sm text-muted-foreground">
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Compress PDF files online for free</h2>
+            <p>OPUS PDF Compressor reduces your PDF file size by up to 90% without requiring any software installation. Whether you need to send a PDF by email, upload it to a portal with a file size limit, or simply save storage space, our free online compressor gets the job done in seconds.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">How does PDF compression work?</h2>
+            <p>Our compressor uses Ghostscript — the industry-standard PDF processing engine — to intelligently downsample images, remove redundant data, and optimise fonts inside your document. You choose the compression level: Screen for maximum size reduction, eBook for a balance of quality and size, Printer for print-ready output, or Prepress for professional publishing.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Your files stay private</h2>
+            <p>We process your PDF on our secure server and delete it immediately after you download the result. We never store, share, or analyse your files. Your documents stay yours.</p>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer className="mt-5 sm:mt-8 text-center text-xs sm:text-sm text-muted-foreground">
           <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-2">

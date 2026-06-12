@@ -3,8 +3,8 @@ import { ProtectPdf } from "@/components/protect-pdf";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
-  title: "Protect PDF – OPUS Productivity Tools",
-  description: "Add a password to your PDF to prevent unauthorised access. Free, fast, no signup.",
+  title: "Protect PDF Online Free – Password Protect Your PDF",
+  description: "Add a password to your PDF to prevent unauthorised access. Encrypt PDF files online for free. No signup, no file storage.",
 };
 
 export default function ProtectPage() {

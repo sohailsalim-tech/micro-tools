@@ -3,8 +3,8 @@ import { MergePdf } from "@/components/merge-pdf";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
-  title: "Merge PDF – OPUS Productivity Tools",
-  description: "Combine multiple PDF files into one document. Free, fast, no signup.",
+  title: "Merge PDF Online Free – Combine PDF Files Into One",
+  description: "Merge multiple PDF files into one document online for free. Drag, drop and combine PDFs instantly. No signup, no limits.",
 };
 
 export default function MergePage() {

@@ -3,8 +3,8 @@ import { ExcelToPdf } from "@/components/excel-to-pdf";
 import { JsonLd } from "@/components/json-ld";
 
 export const metadata: Metadata = {
-  title: "Excel to PDF – OPUS Productivity Tools",
-  description: "Convert Excel spreadsheets (.xls, .xlsx) to PDF instantly. Free, fast, no signup required.",
+  title: "Excel to PDF Online Free – Convert XLSX to PDF",
+  description: "Convert Excel spreadsheets (.xls, .xlsx) to PDF online for free. All sheets, tables and formatting preserved. No signup required.",
 };
 
 export default function ExcelToPdfPage() {
