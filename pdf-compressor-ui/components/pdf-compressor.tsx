@@ -256,23 +256,17 @@ export function PDFCompressor() {
       formData.append("file", file);
       formData.append("level", compressionLevel);
 
-      const { job_id } = await new Promise<{ job_id: string }>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", `${apiUrl}/compress`);
-        xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 18));
-        };
-        xhr.onload = () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve(JSON.parse(xhr.responseText));
-          } else {
-            reject(new Error(xhr.responseText || `Upload failed (${xhr.status})`));
-          }
-        };
-        xhr.onerror = () => reject(new Error("Upload failed — check your connection"));
-        xhr.send(formData);
+      const uploadRes = await fetch(`${apiUrl}/compress`, {
+        method: "POST",
+        body: formData,
       });
 
+      if (!uploadRes.ok) {
+        const errorText = await uploadRes.text().catch(() => "Unknown error");
+        throw new Error(errorText);
+      }
+
+      const { job_id } = await uploadRes.json();
       setProgress(20);
 
       // ── Phase 2: Poll until Ghostscript finishes (20 → 85%) ──
@@ -504,7 +498,7 @@ export function PDFCompressor() {
             <div className="mt-4 sm:mt-6 animate-in fade-in duration-300">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs sm:text-sm font-medium text-foreground">
-                  {progress < 20 ? `Uploading… ${progress}%` : wittyMsg}
+                  {progress < 20 ? "Uploading…" : wittyMsg}
                 </span>
                 <span className="text-xs sm:text-sm font-medium text-primary">
                   {Math.round(progress)}%
