@@ -338,6 +338,83 @@ def _run_split_pdf(job_id: str, pdf_path: str, mode: str, spec: str, tmp_dir: st
             _jobs[job_id].update({"status": "error", "error": str(e)})
 
 
+def _run_word_to_pdf(job_id: str, input_path: str, tmp_dir: str):
+    """Background thread: convert .doc/.docx to PDF using LibreOffice headless."""
+    try:
+        result = subprocess.run(
+            ["libreoffice", "--headless", "--convert-to", "pdf", "--outdir", tmp_dir, input_path],
+            capture_output=True,
+            timeout=300,
+        )
+        if result.returncode != 0:
+            err = result.stderr.decode(errors="replace")
+            with _jobs_lock:
+                _jobs[job_id].update({"status": "error", "error": f"Conversion error: {err}"})
+            return
+
+        base = os.path.splitext(os.path.basename(input_path))[0]
+        output_path = os.path.join(tmp_dir, f"{base}.pdf")
+
+        if not os.path.exists(output_path):
+            with _jobs_lock:
+                _jobs[job_id].update({"status": "error", "error": "Conversion produced no output file"})
+            return
+
+        input_size  = os.path.getsize(input_path)
+        output_size = os.path.getsize(output_path)
+
+        with _jobs_lock:
+            _jobs[job_id].update({
+                "status":               "done",
+                "serve_path":           output_path,
+                "input_size":           input_size,
+                "output_size":          output_size,
+                "output_filename":      f"{base}.pdf",
+                "output_content_type":  "application/pdf",
+            })
+
+    except subprocess.TimeoutExpired:
+        with _jobs_lock:
+            _jobs[job_id].update({"status": "error", "error": "Conversion timed out (300s)"})
+    except Exception as e:
+        with _jobs_lock:
+            _jobs[job_id].update({"status": "error", "error": str(e)})
+
+
+@app.post("/word-to-pdf")
+async def word_to_pdf(file: UploadFile = File(...)):
+    """Accept a .doc or .docx file and convert it to PDF via LibreOffice."""
+    _prune_old_jobs()
+
+    filename = (file.filename or "").lower()
+    if not (filename.endswith(".doc") or filename.endswith(".docx")):
+        raise HTTPException(status_code=400, detail="Only .doc and .docx files are accepted")
+
+    content  = await file.read()
+    job_id   = str(uuid.uuid4())
+    tmp_dir  = tempfile.mkdtemp()
+    ext      = ".docx" if filename.endswith(".docx") else ".doc"
+    in_path  = os.path.join(tmp_dir, f"input{ext}")
+
+    with open(in_path, "wb") as f:
+        f.write(content)
+
+    with _jobs_lock:
+        _jobs[job_id] = {
+            "status":     "processing",
+            "tmp_dir":    tmp_dir,
+            "created_at": time.time(),
+        }
+
+    threading.Thread(
+        target=_run_word_to_pdf,
+        args=(job_id, in_path, tmp_dir),
+        daemon=True,
+    ).start()
+
+    return JSONResponse({"job_id": job_id})
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}

@@ -63,6 +63,16 @@ const tools = [
     border: "hover:border-sky-400",
     badgeColor: "bg-sky-500",
   },
+  {
+    href: "/word-to-pdf",
+    emoji: "📝",
+    title: "Word to PDF",
+    description: "Convert .doc and .docx files to PDF instantly. Free and accurate.",
+    badge: "NEW",
+    color: "from-blue-500/10 to-indigo-500/10",
+    border: "hover:border-blue-400",
+    badgeColor: "bg-blue-500",
+  },
 ];
 
 export default function HomePage() {
