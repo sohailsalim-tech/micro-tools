@@ -16,12 +16,14 @@ export const metadata: Metadata = {
     template: "%s | OPUS Productivity Tools",
   },
   description:
-    "Free online PDF tools — compress, merge, split, protect, convert Word to PDF, Excel to PDF and more. Fast, secure, no signup required.",
+    "Free online PDF tools — compress, merge, split, protect, convert, summarize and translate PDFs with AI. Fast, secure, no signup required.",
   keywords: [
     "pdf tools", "compress pdf", "merge pdf", "split pdf",
     "jpg to pdf", "pdf to jpg", "protect pdf", "free pdf tools online",
     "word to pdf", "excel to pdf", "convert pdf online", "pdf converter free",
     "reduce pdf size", "pdf compressor", "combine pdf files",
+    "pdf summarizer", "summarize pdf", "pdf translator", "translate pdf",
+    "ai pdf tools", "pdf to spanish", "pdf translation online",
   ],
   authors: [{ name: "OPUS Productivity Tools" }],
   creator: "OPUS Productivity Tools",

@@ -32,6 +32,8 @@ export default function NotFound() {
             { href: "/pdf-to-jpg", label: "📄 PDF to JPG" },
             { href: "/word-to-pdf", label: "📝 Word to PDF" },
             { href: "/excel-to-pdf", label: "📊 Excel to PDF" },
+            { href: "/summarize", label: "🧠 PDF Summarizer" },
+            { href: "/translate", label: "🌐 PDF Translator" },
           ].map((tool) => (
             <Link
               key={tool.href}
