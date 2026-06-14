@@ -93,6 +93,16 @@ const tools = [
     border: "hover:border-violet-400",
     badgeColor: "bg-violet-500",
   },
+  {
+    href: "/translate",
+    emoji: "🌐",
+    title: "PDF Translator",
+    description: "Translate any PDF into Spanish, French, German, Chinese, Arabic and 6 more languages.",
+    badge: "AI",
+    color: "from-amber-500/10 to-orange-500/10",
+    border: "hover:border-amber-400",
+    badgeColor: "bg-amber-500",
+  },
 ];
 
 export default function HomePage() {

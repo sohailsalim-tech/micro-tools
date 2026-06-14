@@ -51,8 +51,9 @@ export default function PrivacyPage() {
                 tecpdf.com
               </a>{" "}
               (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). We provide free online PDF tools including
-              compressing, merging, splitting, protecting, converting, and AI-powered summarization of PDF
-              files. This Privacy Policy explains what information we collect, how we use it, and your rights.
+              compressing, merging, splitting, protecting, converting, and AI-powered summarization and
+              translation of PDF files. This Privacy Policy explains what information we collect, how we
+              use it, and your rights.
             </p>
           </section>
 
@@ -66,12 +67,12 @@ export default function PrivacyPage() {
               share, or retain your files.</strong> Files are processed immediately and deleted as soon as
               your download is ready. We never access the content of your documents for these tools.
             </p>
-            <h3 className="text-base font-semibold text-foreground mb-2">PDF Summarizer — AI Processing</h3>
+            <h3 className="text-base font-semibold text-foreground mb-2">PDF Summarizer &amp; PDF Translator — AI Processing</h3>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              The <strong className="text-foreground">PDF Summarizer</strong> tool works differently. When
-              you upload a PDF for summarization, we extract the text content from your document and send
-              it to <strong className="text-foreground">Anthropic, Inc.</strong> (the maker of Claude AI)
-              via their secure API to generate a summary. The extracted text is sent solely to produce your
+              The <strong className="text-foreground">PDF Summarizer</strong> and <strong className="text-foreground">PDF Translator</strong> tools
+              work differently. When you upload a PDF for summarization or translation, we extract the text
+              content from your document and send it to <strong className="text-foreground">Anthropic, Inc.</strong> (the maker of Claude AI)
+              via their secure API to generate a summary or translation. The extracted text is sent solely to produce your
               summary and is not stored by us or used by Anthropic to train AI models. Your original PDF
               file is deleted from our server immediately after text extraction. Anthropic&apos;s handling
               of API data is governed by their{" "}
