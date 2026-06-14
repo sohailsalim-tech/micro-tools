@@ -150,7 +150,12 @@ export function PdfSummarizer() {
               />
               <div className="text-4xl mb-3">🧠</div>
               <p className="font-medium text-sm text-foreground">Drop a PDF here or click to select</p>
-              <p className="text-xs text-muted-foreground mt-1">Max 5 MB · Max 20 pages · Text-based PDFs only</p>
+              <p className="text-xs text-muted-foreground mt-1">Free · Text-based PDFs only</p>
+              <div className="flex items-center justify-center gap-4 mt-3">
+                <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground bg-muted px-2 py-1 rounded-full">📦 Max 5 MB</span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground bg-muted px-2 py-1 rounded-full">📄 Max 20 pages</span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground bg-muted px-2 py-1 rounded-full">⏱️ 3 / hour</span>
+              </div>
             </div>
           )}
 
