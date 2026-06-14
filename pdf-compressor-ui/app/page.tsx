@@ -153,6 +153,13 @@ export default function HomePage() {
           <span className="flex items-center gap-1.5">🆓 Always free</span>
           <span className="flex items-center gap-1.5">🌍 Works on all devices</span>
         </div>
+        <div className="pb-5 text-center text-xs text-muted-foreground">
+          <Link href="/privacy" className="hover:text-foreground transition-colors underline underline-offset-2">
+            Privacy Policy
+          </Link>
+          <span className="mx-2">·</span>
+          <span>© {new Date().getFullYear()} OPUS Productivity Tools</span>
+        </div>
       </section>
     </main>
   );
