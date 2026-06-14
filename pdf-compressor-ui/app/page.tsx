@@ -158,6 +158,10 @@ export default function HomePage() {
             Privacy Policy
           </Link>
           <span className="mx-2">·</span>
+          <Link href="/terms" className="hover:text-foreground transition-colors underline underline-offset-2">
+            Terms of Service
+          </Link>
+          <span className="mx-2">·</span>
           <span>© {new Date().getFullYear()} OPUS Productivity Tools</span>
         </div>
       </section>
