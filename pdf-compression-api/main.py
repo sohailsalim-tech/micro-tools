@@ -849,24 +849,24 @@ async def split_pdf(
 
 
 # ---------------------------------------------------------------------------
-# PDF Summarizer
+# AI tools — shared rate limiter
 # ---------------------------------------------------------------------------
 
-_rate_limit: dict[str, list[float]] = {}
+_rate_limit: dict[str, dict[str, list[float]]] = {}
 _rate_limit_lock = threading.Lock()
-SUMMARIZE_MAX_PER_HOUR = 3
-SUMMARIZE_WINDOW = 3600
+AI_WINDOW = 3600
 
 
-def _check_rate_limit(ip: str) -> bool:
+def _check_rate_limit(ip: str, tool: str, max_calls: int) -> bool:
     now = time.time()
     with _rate_limit_lock:
-        timestamps = [t for t in _rate_limit.get(ip, []) if now - t < SUMMARIZE_WINDOW]
-        if len(timestamps) >= SUMMARIZE_MAX_PER_HOUR:
-            _rate_limit[ip] = timestamps
+        ip_data = _rate_limit.setdefault(ip, {})
+        timestamps = [t for t in ip_data.get(tool, []) if now - t < AI_WINDOW]
+        if len(timestamps) >= max_calls:
+            ip_data[tool] = timestamps
             return False
         timestamps.append(now)
-        _rate_limit[ip] = timestamps
+        ip_data[tool] = timestamps
         return True
 
 
@@ -876,7 +876,7 @@ async def summarize_pdf(request: Request, file: UploadFile = File(...)):
     _prune_old_jobs()
 
     client_ip = request.client.host if request.client else "unknown"
-    if not _check_rate_limit(client_ip):
+    if not _check_rate_limit(client_ip, "summarize", 3):
         raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 3 summaries per hour.")
 
     if not (file.filename or "").lower().endswith(".pdf"):
@@ -937,6 +937,89 @@ async def summarize_pdf(request: Request, file: UploadFile = File(...)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Summarization failed: {str(e)}")
+
+
+SUPPORTED_LANGUAGES = {
+    "Spanish", "French", "German", "Portuguese", "Chinese (Simplified)",
+    "Japanese", "Korean", "Arabic", "Hindi", "Italian",
+}
+
+@app.post("/translate")
+async def translate_pdf(
+    request: Request,
+    file: UploadFile = File(...),
+    target_language: str = Form(...),
+):
+    """Extract text from a PDF and translate it using Claude."""
+    _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "translate", 2):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 2 translations per hour.")
+
+    if target_language not in SUPPORTED_LANGUAGES:
+        raise HTTPException(status_code=400, detail=f"Unsupported language: {target_language}")
+
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+
+    content = await file.read()
+
+    if len(content) > 3 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 3 MB.")
+
+    try:
+        reader = PdfReader(io.BytesIO(content))
+        total_pages = len(reader.pages)
+
+        if total_pages > 10:
+            raise HTTPException(status_code=400, detail=f"PDF has {total_pages} pages. Maximum is 10 pages.")
+
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() or ""
+        text = text.strip()
+
+        if len(text) < 50:
+            raise HTTPException(status_code=400, detail="Not enough text found. This PDF may be a scanned image — try a text-based PDF.")
+
+        if len(text) > 30000:
+            text = text[:30000] + "\n\n[Document truncated]"
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not read PDF: {e}")
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="Translation service is not configured")
+
+    try:
+        ai_client = anthropic.Anthropic(api_key=api_key)
+        message = ai_client.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens=4096,
+            messages=[{
+                "role": "user",
+                "content": (
+                    f"Translate the following document into {target_language}. "
+                    "Preserve the original structure, paragraphs, and formatting as closely as possible. "
+                    "Output only the translated text — no explanations, no commentary.\n\n"
+                    f"Document:\n\n{text}"
+                ),
+            }],
+        )
+        translation = message.content[0].text
+        return JSONResponse({
+            "translation": translation,
+            "target_language": target_language,
+            "pages": total_pages,
+            "word_count": len(text.split()),
+        })
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
 
 
 @app.get("/download/{job_id}")
