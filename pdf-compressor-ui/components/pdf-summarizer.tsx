@@ -252,7 +252,7 @@ export function PdfSummarizer() {
           </div>
           <div>
             <h2 className="text-base font-semibold text-foreground mb-2">How does AI PDF summarization work?</h2>
-            <p>Your PDF is uploaded to our secure server, text is extracted from each page, and sent to Claude — one of the most capable AI models available — which identifies the main topics, key findings, and conclusions. The result is a concise, bullet-pointed summary you can copy and use immediately.</p>
+            <p>Your PDF is uploaded to our secure server, text is extracted from each page, and processed by our AI engine which identifies the main topics, key findings, and conclusions. The result is a concise, bullet-pointed summary you can copy and use immediately.</p>
           </div>
           <div>
             <h2 className="text-base font-semibold text-foreground mb-2">Your files stay private</h2>
@@ -261,7 +261,7 @@ export function PdfSummarizer() {
         </section>
 
         <footer className="mt-5 text-center text-xs text-muted-foreground">
-          <span>🔒 Your files are never stored · AI-powered by Claude</span>
+          <span>🔒 Your files are never stored · AI-powered</span>
         </footer>
       </div>
     </main>
