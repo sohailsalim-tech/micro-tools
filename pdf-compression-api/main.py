@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.background import BackgroundTask
@@ -14,6 +14,7 @@ from PIL import Image
 from pypdf import PdfWriter, PdfReader
 import zipfile
 import io
+import anthropic
 
 app = FastAPI(title="OPUS PDF Compressor API")
 
@@ -845,6 +846,97 @@ async def split_pdf(
     ).start()
 
     return JSONResponse({"job_id": job_id})
+
+
+# ---------------------------------------------------------------------------
+# PDF Summarizer
+# ---------------------------------------------------------------------------
+
+_rate_limit: dict[str, list[float]] = {}
+_rate_limit_lock = threading.Lock()
+SUMMARIZE_MAX_PER_HOUR = 3
+SUMMARIZE_WINDOW = 3600
+
+
+def _check_rate_limit(ip: str) -> bool:
+    now = time.time()
+    with _rate_limit_lock:
+        timestamps = [t for t in _rate_limit.get(ip, []) if now - t < SUMMARIZE_WINDOW]
+        if len(timestamps) >= SUMMARIZE_MAX_PER_HOUR:
+            _rate_limit[ip] = timestamps
+            return False
+        timestamps.append(now)
+        _rate_limit[ip] = timestamps
+        return True
+
+
+@app.post("/summarize")
+async def summarize_pdf(request: Request, file: UploadFile = File(...)):
+    """Extract text from a PDF and summarize it using Claude Haiku."""
+    _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 3 summaries per hour.")
+
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+
+    content = await file.read()
+
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5 MB.")
+
+    try:
+        reader = PdfReader(io.BytesIO(content))
+        total_pages = len(reader.pages)
+
+        if total_pages > 20:
+            raise HTTPException(status_code=400, detail=f"PDF has {total_pages} pages. Maximum is 20 pages.")
+
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() or ""
+        text = text.strip()
+
+        if len(text) < 100:
+            raise HTTPException(status_code=400, detail="Not enough text found. This PDF may be a scanned image — try a text-based PDF.")
+
+        if len(text) > 50000:
+            text = text[:50000] + "\n\n[Document truncated]"
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not read PDF: {e}")
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="Summarization service is not configured")
+
+    try:
+        ai_client = anthropic.Anthropic(api_key=api_key)
+        message = ai_client.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens=1024,
+            messages=[{
+                "role": "user",
+                "content": (
+                    "Provide a clear, concise summary of the following document. "
+                    "Start with a 2-3 sentence overview, then list the key points as bullet points.\n\n"
+                    f"Document:\n\n{text}"
+                ),
+            }],
+        )
+        summary = message.content[0].text
+        return JSONResponse({
+            "summary": summary,
+            "pages": total_pages,
+            "word_count": len(text.split()),
+        })
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Summarization failed: {str(e)}")
 
 
 @app.get("/download/{job_id}")
