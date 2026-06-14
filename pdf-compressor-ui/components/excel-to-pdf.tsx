@@ -252,6 +252,22 @@ export function ExcelToPdf() {
           )}
         </div>
 
+        {/* SEO content */}
+        <section className="mt-8 sm:mt-12 space-y-6 text-sm text-muted-foreground">
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Convert Excel to PDF online for free</h2>
+            <p>OPUS Excel to PDF converter transforms your .xls and .xlsx spreadsheets into clean, print-ready PDFs in seconds — no Excel licence needed. Perfect for sharing financial reports, budgets, and data tables in a format that looks consistent for every recipient, on any device.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">How does Excel to PDF conversion work?</h2>
+            <p>Upload your Excel file and our server uses LibreOffice Calc to render your spreadsheet to PDF, preserving cell formatting, column widths, formulas display, charts, and page layout. Multi-sheet workbooks are converted with each sheet as a separate page. The conversion is accurate and fast, typically completing in under 10 seconds.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Your files stay private</h2>
+            <p>Your spreadsheet data is uploaded to our secure server for conversion only and deleted immediately after your PDF is generated. We never access, store, or share the data inside your Excel files. Your financial and business data stays completely private.</p>
+          </div>
+        </section>
+
         <footer className="mt-5 text-center text-xs text-muted-foreground">
           <span>🔒 Your files are never stored on our servers</span>
         </footer>

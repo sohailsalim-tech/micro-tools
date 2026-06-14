@@ -370,6 +370,22 @@ export function JpgToPdf() {
           )}
         </div>
 
+        {/* SEO content */}
+        <section className="mt-8 sm:mt-12 space-y-6 text-sm text-muted-foreground">
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Convert JPG to PDF online for free</h2>
+            <p>OPUS JPG to PDF converter lets you turn one or multiple images into a professional PDF document in seconds. Whether you&apos;re scanning receipts, creating a photo album, or submitting images as a single document, our free online tool combines your JPGs into a clean, compressed PDF without any software.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">How does JPG to PDF conversion work?</h2>
+            <p>Upload your JPG or PNG images and our server arranges them into a properly formatted PDF, one image per page, in the order you upload them. Images are intelligently compressed to keep the file size manageable while maintaining visual quality. The result is a single PDF ready to share, print, or archive.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Your files stay private</h2>
+            <p>Your uploaded images are processed on our secure server and deleted immediately after the PDF is generated. We never store, view, or share your photos or images. Your personal files remain completely private.</p>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer className="mt-5 text-center text-xs text-muted-foreground">
           <div className="flex items-center justify-center gap-1.5">

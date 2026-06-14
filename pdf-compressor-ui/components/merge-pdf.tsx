@@ -339,6 +339,22 @@ export function MergePdf() {
           )}
         </div>
 
+        {/* SEO content */}
+        <section className="mt-8 sm:mt-12 space-y-6 text-sm text-muted-foreground">
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Merge PDF files online for free</h2>
+            <p>OPUS PDF Merger lets you combine multiple PDF files into a single document in seconds — no software installation, no signup required. Whether you&apos;re consolidating reports, combining scanned pages, or assembling a portfolio, our free online tool handles it instantly from any device.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">How does PDF merging work?</h2>
+            <p>Simply upload two or more PDF files and our server merges them in the order you provide, preserving all text, images, fonts, and formatting from each document. The output is a single, clean PDF ready to download. There are no file count limits on the free plan — merge as many as you need.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Your files stay private</h2>
+            <p>All uploaded PDFs are processed on our secure server and permanently deleted as soon as your merged file is ready to download. We never store, read, or share your documents. Your files remain completely yours.</p>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer className="mt-5 text-center text-xs text-muted-foreground">
           <div className="flex items-center justify-center gap-1.5">

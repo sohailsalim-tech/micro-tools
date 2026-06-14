@@ -357,6 +357,22 @@ export function PdfToJpg() {
           )}
         </div>
 
+        {/* SEO content */}
+        <section className="mt-8 sm:mt-12 space-y-6 text-sm text-muted-foreground">
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Convert PDF to JPG online for free</h2>
+            <p>OPUS PDF to JPG converter extracts every page of your PDF as a high-quality image in seconds — no software, no account needed. Ideal for sharing PDF content on social media, embedding pages in presentations, or extracting images from scanned documents.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">How does PDF to JPG conversion work?</h2>
+            <p>Upload your PDF and our server renders each page at high resolution and exports it as an individual JPG image. Multi-page PDFs produce one image per page, all packaged in a ZIP file for easy download. The conversion preserves text sharpness, colours, and layout exactly as they appear in the original PDF.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Your files stay private</h2>
+            <p>Your PDF is uploaded to our secure server solely for conversion and deleted immediately after your images are ready. We do not read the content of your documents, store your files, or share them with any third party.</p>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer className="mt-5 text-center text-xs text-muted-foreground">
           <div className="flex items-center justify-center gap-1.5">

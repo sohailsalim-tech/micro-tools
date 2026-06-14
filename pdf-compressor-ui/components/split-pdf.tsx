@@ -408,6 +408,22 @@ export function SplitPdf() {
           )}
         </div>
 
+        {/* SEO content */}
+        <section className="mt-8 sm:mt-12 space-y-6 text-sm text-muted-foreground">
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Split PDF files online for free</h2>
+            <p>OPUS PDF Splitter lets you divide any PDF into separate pages or extract specific page ranges — all online, no software needed. Perfect for extracting a single chapter from a book, separating invoices, or isolating specific pages from a large document.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">How does PDF splitting work?</h2>
+            <p>Upload your PDF and choose how to split it — extract all pages as individual files, or specify a custom page range. Our server processes your document instantly using industry-standard PDF tools, preserving all content, images, and formatting in every output file.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Your files stay private</h2>
+            <p>Your uploaded PDF is processed on our secure server and deleted immediately after your download is ready. We never read, store, or share your files. What&apos;s in your PDF stays between you and your device.</p>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer className="mt-5 text-center text-xs text-muted-foreground">
           <div className="flex items-center justify-center gap-1.5">

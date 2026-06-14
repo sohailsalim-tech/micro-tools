@@ -374,6 +374,22 @@ export function ProtectPdf() {
           )}
         </div>
 
+        {/* SEO content */}
+        <section className="mt-8 sm:mt-12 space-y-6 text-sm text-muted-foreground">
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Password protect PDF files online for free</h2>
+            <p>OPUS PDF Protector adds a strong password to any PDF file instantly — no software, no signup. Whether you&apos;re securing a contract, a confidential report, or sensitive personal documents, our free online tool encrypts your PDF with AES-256 encryption in seconds.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">How does PDF password protection work?</h2>
+            <p>Upload your PDF, set a password, and our server applies AES-256 encryption — the same standard used by banks and governments. The protected PDF can only be opened by someone who knows the password. We never see or store your password; encryption happens server-side and the key is never logged.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Your files stay private</h2>
+            <p>Your PDF and password are used solely for the encryption process and deleted immediately after your protected file is ready. We do not store, log, or have access to your documents or your chosen password at any point.</p>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer className="mt-5 text-center text-xs text-muted-foreground">
           <div className="flex items-center justify-center gap-1.5">

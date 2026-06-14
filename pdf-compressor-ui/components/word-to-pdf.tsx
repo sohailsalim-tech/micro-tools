@@ -256,6 +256,22 @@ export function WordToPdf() {
           )}
         </div>
 
+        {/* SEO content */}
+        <section className="mt-8 sm:mt-12 space-y-6 text-sm text-muted-foreground">
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Convert Word to PDF online for free</h2>
+            <p>OPUS Word to PDF converter turns your .doc and .docx files into perfectly formatted PDFs instantly — no Microsoft Office required. Whether you&apos;re sending a CV, a business proposal, or a report, converting to PDF ensures your formatting looks identical on every device and operating system.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">How does Word to PDF conversion work?</h2>
+            <p>Upload your Word document and our server uses LibreOffice — a professional-grade document engine — to render it to PDF with full fidelity. Fonts, tables, images, headers, footers, and page layout are all preserved exactly as they appear in your original document. The conversion takes just a few seconds regardless of document length.</p>
+          </div>
+          <div>
+            <h2 className="text-base font-semibold text-foreground mb-2">Your files stay private</h2>
+            <p>Your Word document is processed on our secure server and permanently deleted as soon as your PDF is ready to download. We never read, store, or share the contents of your documents. Your work remains completely confidential.</p>
+          </div>
+        </section>
+
         <footer className="mt-5 text-center text-xs text-muted-foreground">
           <span>🔒 Your files are never stored on our servers</span>
         </footer>
