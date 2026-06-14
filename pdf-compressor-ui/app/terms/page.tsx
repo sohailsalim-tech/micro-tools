@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://tecpdf.com/terms" },
 };
 
-const EFFECTIVE_DATE = "June 14, 2026";
+const EFFECTIVE_DATE = "June 14, 2026 (updated June 14, 2026)";
 const CONTACT_EMAIL = "privacy@tecpdf.com";
 
 export default function TermsPage() {
@@ -52,8 +52,8 @@ export default function TermsPage() {
             <h2 className="text-xl font-semibold text-foreground mb-3">2. Description of Service</h2>
             <p className="text-muted-foreground leading-relaxed">
               OPUS Productivity Tools provides free online PDF processing tools including compressing,
-              merging, splitting, protecting, and converting files. The Service is provided &quot;as is&quot;
-              and is intended for personal and professional use.
+              merging, splitting, protecting, converting, and AI-powered summarization of files. The
+              Service is provided &quot;as is&quot; and is intended for personal and professional use.
             </p>
           </section>
 
@@ -71,17 +71,36 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">4. File Uploads & Privacy</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-3">4. File Uploads &amp; Privacy</h2>
+            <p className="text-muted-foreground leading-relaxed mb-3">
+              Files you upload to our standard tools (Compress, Merge, Split, Protect, Convert) are
+              processed solely to perform the requested operation and are deleted immediately after
+              your download is ready. We do not store, read, share, or retain your files for these
+              tools. You retain full ownership of all files you upload.
+            </p>
             <p className="text-muted-foreground leading-relaxed">
-              Files you upload are processed solely to perform the requested operation and are
-              deleted immediately after your download is ready. We do not store, read, share, or
-              retain your files. You retain full ownership of all files you upload. By uploading
-              a file, you confirm you have the right to do so.
+              For the <strong className="text-foreground">PDF Summarizer</strong> tool, text is
+              extracted from your PDF and transmitted to Anthropic, Inc. to generate an AI summary.
+              By using the PDF Summarizer, you consent to this processing. Do not upload documents
+              containing confidential, sensitive, or personally identifiable information to the PDF
+              Summarizer. By uploading any file, you confirm you have the right to do so.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">5. Intellectual Property</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-3">5. AI-Generated Content Disclaimer</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              The PDF Summarizer tool generates summaries using artificial intelligence (Claude AI by
+              Anthropic). AI-generated summaries are provided for informational purposes only and may
+              contain errors, omissions, or inaccuracies. You should not rely on AI-generated summaries
+              for legal, medical, financial, or other professional decisions. Always refer to the
+              original document for authoritative content. OPUS Productivity Tools makes no warranty
+              regarding the accuracy, completeness, or reliability of AI-generated summaries.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-foreground mb-3">6. Intellectual Property</h2>
             <p className="text-muted-foreground leading-relaxed">
               The Service, including its design, code, and content, is owned by OPUS Productivity Tools
               and protected by intellectual property laws. You may not copy, reproduce, or distribute
@@ -91,7 +110,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">6. Disclaimer of Warranties</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-3">7. Disclaimer of Warranties</h2>
             <p className="text-muted-foreground leading-relaxed">
               The Service is provided <strong className="text-foreground">&quot;as is&quot; and &quot;as available&quot;</strong> without
               warranties of any kind, either express or implied. We do not warrant that the Service
@@ -101,7 +120,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">7. Limitation of Liability</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-3">8. Limitation of Liability</h2>
             <p className="text-muted-foreground leading-relaxed">
               To the fullest extent permitted by law, OPUS Productivity Tools shall not be liable
               for any indirect, incidental, special, consequential, or punitive damages, including
@@ -112,16 +131,16 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">8. Third-Party Services</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-3">9. Third-Party Services</h2>
             <p className="text-muted-foreground leading-relaxed">
-              The Service uses third-party services including Google AdSense, Google Analytics,
-              and Vercel. These services have their own terms and privacy policies. We are not
-              responsible for the practices of these third-party providers.
+              The Service uses third-party services including Anthropic (Claude AI), Google AdSense,
+              Google Analytics, and Vercel. These services have their own terms and privacy policies.
+              We are not responsible for the practices of these third-party providers.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">9. Service Availability</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-3">10. Service Availability</h2>
             <p className="text-muted-foreground leading-relaxed">
               We reserve the right to modify, suspend, or discontinue the Service at any time
               without notice. We are not liable to you or any third party for any modification,
@@ -130,7 +149,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">10. Governing Law</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-3">11. Governing Law</h2>
             <p className="text-muted-foreground leading-relaxed">
               These Terms shall be governed by and construed in accordance with applicable laws.
               Any disputes arising from these Terms or the Service shall be resolved through
@@ -139,7 +158,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">11. Changes to Terms</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-3">12. Changes to Terms</h2>
             <p className="text-muted-foreground leading-relaxed">
               We may update these Terms at any time. Continued use of the Service after changes
               constitutes acceptance of the new Terms. We will update the effective date above
@@ -148,7 +167,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">12. Contact</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-3">13. Contact</h2>
             <p className="text-muted-foreground leading-relaxed">
               Questions about these Terms? Contact us at{" "}
               <a href={`mailto:${CONTACT_EMAIL}`} className="text-foreground underline underline-offset-2 hover:no-underline">

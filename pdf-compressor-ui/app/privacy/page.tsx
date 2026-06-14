@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://tecpdf.com/privacy" },
 };
 
-const EFFECTIVE_DATE = "June 14, 2026";
+const EFFECTIVE_DATE = "June 14, 2026 (updated June 14, 2026)";
 const CONTACT_EMAIL = "privacy@tecpdf.com";
 const SITE_URL = "https://tecpdf.com";
 
@@ -51,8 +51,8 @@ export default function PrivacyPage() {
                 tecpdf.com
               </a>{" "}
               (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). We provide free online PDF tools including
-              compressing, merging, splitting, protecting, and converting PDF files. This Privacy Policy
-              explains what information we collect, how we use it, and your rights.
+              compressing, merging, splitting, protecting, converting, and AI-powered summarization of PDF
+              files. This Privacy Policy explains what information we collect, how we use it, and your rights.
             </p>
           </section>
 
@@ -60,11 +60,30 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold text-foreground mb-3">2. Information We Collect</h2>
 
             <h3 className="text-base font-semibold text-foreground mb-2">Files You Upload</h3>
-            <p className="text-muted-foreground leading-relaxed mb-4">
-              When you use our tools, you upload files (PDFs, images, Word documents, Excel spreadsheets)
+            <p className="text-muted-foreground leading-relaxed mb-3">
+              When you use our standard tools (Compress, Merge, Split, Protect, Convert), you upload files
               to our servers for processing. <strong className="text-foreground">We do not store, read,
-              share, or retain your files.</strong> Files are processed immediately and deleted from our
-              servers as soon as your download is ready. We never access the content of your documents.
+              share, or retain your files.</strong> Files are processed immediately and deleted as soon as
+              your download is ready. We never access the content of your documents for these tools.
+            </p>
+            <h3 className="text-base font-semibold text-foreground mb-2">PDF Summarizer — AI Processing</h3>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              The <strong className="text-foreground">PDF Summarizer</strong> tool works differently. When
+              you upload a PDF for summarization, we extract the text content from your document and send
+              it to <strong className="text-foreground">Anthropic, Inc.</strong> (the maker of Claude AI)
+              via their secure API to generate a summary. The extracted text is sent solely to produce your
+              summary and is not stored by us or used by Anthropic to train AI models. Your original PDF
+              file is deleted from our server immediately after text extraction. Anthropic&apos;s handling
+              of API data is governed by their{" "}
+              <a
+                href="https://www.anthropic.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground underline underline-offset-2 hover:no-underline"
+              >
+                Privacy Policy
+              </a>
+              . Do not upload confidential or sensitive documents to the PDF Summarizer tool.
             </p>
 
             <h3 className="text-base font-semibold text-foreground mb-2">Usage Data</h3>
@@ -94,6 +113,24 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-foreground mb-3">4. Third-Party Services</h2>
+
+            <h3 className="text-base font-semibold text-foreground mb-2">Anthropic (Claude AI)</h3>
+            <p className="text-muted-foreground leading-relaxed mb-4">
+              Our PDF Summarizer tool uses the Claude AI API provided by Anthropic, Inc. When you use the
+              PDF Summarizer, the text extracted from your PDF is transmitted to Anthropic&apos;s servers
+              to generate a summary. Anthropic does not use API inputs or outputs to train their AI models
+              under their standard API usage policy. Data is transmitted over encrypted HTTPS connections.
+              For more information, see{" "}
+              <a
+                href="https://www.anthropic.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground underline underline-offset-2 hover:no-underline"
+              >
+                Anthropic&apos;s Privacy Policy
+              </a>
+              .
+            </p>
 
             <h3 className="text-base font-semibold text-foreground mb-2">Google AdSense</h3>
             <p className="text-muted-foreground leading-relaxed mb-4">
@@ -172,9 +209,10 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold text-foreground mb-3">6. Data Sharing</h2>
             <p className="text-muted-foreground leading-relaxed">
               We do not sell, trade, or rent your personal information to third parties. We only share
-              data with service providers as described in Section 4 (Google AdSense, Google Analytics,
-              Vercel), and only as necessary to operate the service. We may disclose information if
-              required by law or to protect our legal rights.
+              data with service providers as described in Section 4 (Anthropic, Google AdSense, Google
+              Analytics, Vercel), and only as necessary to operate the service. Specifically, document
+              text is shared with Anthropic only when you use the PDF Summarizer tool. We may disclose
+              information if required by law or to protect our legal rights.
             </p>
           </section>
 
