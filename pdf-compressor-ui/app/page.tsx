@@ -83,6 +83,16 @@ const tools = [
     border: "hover:border-green-400",
     badgeColor: "bg-green-500",
   },
+  {
+    href: "/summarize",
+    emoji: "🧠",
+    title: "PDF Summarizer",
+    description: "Get an AI-powered summary of any PDF report, paper, or contract in seconds.",
+    badge: "AI",
+    color: "from-violet-500/10 to-purple-500/10",
+    border: "hover:border-violet-400",
+    badgeColor: "bg-violet-500",
+  },
 ];
 
 export default function HomePage() {
