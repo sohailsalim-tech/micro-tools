@@ -4,6 +4,7 @@ import Script from 'next/script'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
+import { CookieBanner } from '@/components/cookie-banner'
 import './globals.css'
 
 const inter = Inter({ variable: '--font-inter', subsets: ['latin'] })
@@ -62,6 +63,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ThemeProvider>
           {children}
+          <CookieBanner />
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <GoogleAnalytics gaId="G-SVQP1NN76T" />}
