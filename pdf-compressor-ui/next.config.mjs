@@ -52,4 +52,5 @@ export default withSentryConfig(nextConfig, {
   silent: true,
   disableLogger: true,
   telemetry: false,
+  sourcemaps: { disable: true },
 });
