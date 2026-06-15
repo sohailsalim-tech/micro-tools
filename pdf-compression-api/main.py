@@ -16,6 +16,7 @@ import zipfile
 import io
 import anthropic
 import sentry_sdk
+import json
 
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
@@ -1067,6 +1068,137 @@ async def translate_pdf(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
+
+
+# ---------------------------------------------------------------------------
+# Chat with PDF
+# ---------------------------------------------------------------------------
+
+_chat_sessions: dict[str, dict] = {}
+_chat_lock = threading.Lock()
+CHAT_TTL = 3600
+
+
+def _prune_chat_sessions():
+    cutoff = time.time() - CHAT_TTL
+    with _chat_lock:
+        stale = [sid for sid, s in _chat_sessions.items() if s.get("created_at", 0) < cutoff]
+        for sid in stale:
+            del _chat_sessions[sid]
+
+
+@app.post("/chat-pdf/start")
+async def chat_pdf_start(request: Request, file: UploadFile = File(...)):
+    """Upload a PDF and extract its text — returns a session_id for subsequent chat messages."""
+    _prune_chat_sessions()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "chat-start", 3):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 3 PDF uploads per hour.")
+
+    if not (file.filename or "").lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are accepted")
+
+    content = await file.read()
+
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5 MB.")
+
+    try:
+        reader = PdfReader(io.BytesIO(content))
+        total_pages = len(reader.pages)
+
+        if total_pages > 20:
+            raise HTTPException(status_code=400, detail=f"PDF has {total_pages} pages. Maximum is 20 pages.")
+
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() or ""
+        text = text.strip()
+
+        if len(text) < 50:
+            raise HTTPException(status_code=400, detail="Not enough text found. This PDF may be a scanned image — try a text-based PDF.")
+
+        if len(text) > 50000:
+            text = text[:50000] + "\n\n[Document truncated at 50,000 characters]"
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not read PDF: {e}")
+
+    session_id = str(uuid.uuid4())
+    with _chat_lock:
+        _chat_sessions[session_id] = {
+            "pdf_text":   text,
+            "page_count": total_pages,
+            "word_count": len(text.split()),
+            "created_at": time.time(),
+        }
+
+    return JSONResponse({
+        "session_id": session_id,
+        "pages":      total_pages,
+        "word_count": len(text.split()),
+    })
+
+
+@app.post("/chat-pdf/message")
+async def chat_pdf_message(
+    request: Request,
+    session_id: str = Form(...),
+    messages: str = Form(...),
+):
+    """Send a message in a chat session. messages is a JSON array of {role, content} pairs."""
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "chat-message", 10):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 10 messages per hour.")
+
+    with _chat_lock:
+        session = _chat_sessions.get(session_id)
+
+    if not session:
+        raise HTTPException(status_code=404, detail="Session expired. Please upload your PDF again.")
+
+    try:
+        msg_list = json.loads(messages)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid messages format.")
+
+    if not msg_list or not isinstance(msg_list, list) or len(msg_list) > 20:
+        raise HTTPException(status_code=400, detail="Invalid message count (max 20 messages per session).")
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="Chat service is not configured")
+
+    pdf_text = session["pdf_text"]
+
+    # Inject PDF text into the first user message only
+    claude_messages = []
+    for i, msg in enumerate(msg_list):
+        role    = msg.get("role", "user")
+        content = msg.get("content", "")
+        if i == 0 and role == "user":
+            content = f"Here is the full text of my PDF document:\n\n{pdf_text}\n\n---\n\nMy question: {content}"
+        claude_messages.append({"role": role, "content": content})
+
+    try:
+        ai_client = anthropic.Anthropic(api_key=api_key)
+        message = ai_client.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens=1024,
+            system=(
+                "You are a helpful document assistant. Answer questions based solely on the PDF document "
+                "provided by the user. Be concise and accurate. If the answer is not in the document, "
+                "say so clearly. Do not reference how the document was provided to you."
+            ),
+            messages=claude_messages,
+        )
+        return JSONResponse({"response": message.content[0].text})
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Chat failed: {str(e)}")
 
 
 @app.get("/download/{job_id}")

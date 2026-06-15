@@ -103,6 +103,16 @@ const tools = [
     border: "hover:border-amber-400",
     badgeColor: "bg-amber-500",
   },
+  {
+    href: "/chat",
+    emoji: "💬",
+    title: "Chat with PDF",
+    description: "Ask questions about any PDF document and get instant AI-powered answers.",
+    badge: "AI",
+    color: "from-teal-500/10 to-cyan-500/10",
+    border: "hover:border-teal-400",
+    badgeColor: "bg-teal-500",
+  },
 ];
 
 export default function HomePage() {

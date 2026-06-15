@@ -34,6 +34,7 @@ export default function NotFound() {
             { href: "/excel-to-pdf", label: "📊 Excel to PDF" },
             { href: "/summarize", label: "🧠 PDF Summarizer" },
             { href: "/translate", label: "🌐 PDF Translator" },
+            { href: "/chat",      label: "💬 Chat with PDF" },
           ].map((tool) => (
             <Link
               key={tool.href}
