@@ -383,9 +383,13 @@ def _run_word_to_pdf(job_id: str, input_path: str, tmp_dir: str):
 
 
 @app.post("/excel-to-pdf")
-async def excel_to_pdf(file: UploadFile = File(...)):
+async def excel_to_pdf(request: Request, file: UploadFile = File(...)):
     """Accept a .xls or .xlsx file and convert it to PDF via LibreOffice."""
     _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "excel-to-pdf", 10):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 10 conversions per hour.")
 
     filename = (file.filename or "").lower()
     if not (filename.endswith(".xls") or filename.endswith(".xlsx")):
@@ -417,9 +421,13 @@ async def excel_to_pdf(file: UploadFile = File(...)):
 
 
 @app.post("/word-to-pdf")
-async def word_to_pdf(file: UploadFile = File(...)):
+async def word_to_pdf(request: Request, file: UploadFile = File(...)):
     """Accept a .doc or .docx file and convert it to PDF via LibreOffice."""
     _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "word-to-pdf", 10):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 10 conversions per hour.")
 
     filename = (file.filename or "").lower()
     if not (filename.endswith(".doc") or filename.endswith(".docx")):
@@ -457,6 +465,7 @@ async def health():
 
 @app.post("/compress")
 async def compress_pdf(
+    request: Request,
     file: UploadFile = File(...),
     level: str = Form("ebook"),
 ):
@@ -465,6 +474,10 @@ async def compress_pdf(
     and return a job_id immediately — no waiting for GS to finish.
     """
     _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "compress", 15):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 15 compressions per hour.")
 
     if not level.startswith("/"):
         level = f"/{level}"
@@ -525,9 +538,13 @@ async def job_status(job_id: str):
 
 
 @app.post("/merge-pdf")
-async def merge_pdf(files: List[UploadFile] = File(...)):
+async def merge_pdf(request: Request, files: List[UploadFile] = File(...)):
     """Accept multiple PDFs in order, merge them, return job_id."""
     _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "merge-pdf", 15):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 15 merges per hour.")
 
     if len(files) < 2:
         raise HTTPException(status_code=400, detail="Please upload at least 2 PDF files to merge")
@@ -567,6 +584,7 @@ async def merge_pdf(files: List[UploadFile] = File(...)):
 
 @app.post("/jpg-to-pdf")
 async def jpg_to_pdf(
+    request: Request,
     files: List[UploadFile] = File(...),
     level: str = Form("screen"),
 ):
@@ -575,6 +593,10 @@ async def jpg_to_pdf(
     Returns job_id immediately — same polling pattern as /compress.
     """
     _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "jpg-to-pdf", 15):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 15 conversions per hour.")
 
     if not level.startswith("/"):
         level = f"/{level}"
@@ -687,11 +709,16 @@ def _run_pdf_to_jpg(job_id: str, pdf_path: str, dpi: int, tmp_dir: str):
 
 @app.post("/pdf-to-jpg")
 async def pdf_to_jpg(
+    request: Request,
     file: UploadFile = File(...),
     quality: str = Form("standard"),
 ):
     """Render every page of a PDF as a JPEG. Returns job_id for polling."""
     _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "pdf-to-jpg", 15):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 15 conversions per hour.")
 
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
@@ -752,11 +779,16 @@ def _run_protect_pdf(job_id: str, pdf_path: str, password: str, output_path: str
 
 @app.post("/protect-pdf")
 async def protect_pdf(
+    request: Request,
     file: UploadFile = File(...),
     password: str = Form(...),
 ):
     """Encrypt a PDF with a password. Returns job_id for polling."""
     _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "protect-pdf", 20):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 20 operations per hour.")
 
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
@@ -793,8 +825,12 @@ async def protect_pdf(
 
 
 @app.post("/pdf-info")
-async def pdf_info(file: UploadFile = File(...)):
+async def pdf_info(request: Request, file: UploadFile = File(...)):
     """Return page count without storing anything — fast, synchronous."""
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "pdf-info", 20):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 20 requests per hour.")
+
     content = await file.read()
     try:
         reader = PdfReader(io.BytesIO(content))
@@ -805,6 +841,7 @@ async def pdf_info(file: UploadFile = File(...)):
 
 @app.post("/split-pdf")
 async def split_pdf(
+    request: Request,
     file: UploadFile = File(...),
     mode: str = Form("extract"),
     spec: str = Form(""),
@@ -816,6 +853,10 @@ async def split_pdf(
     mode=all                                 → split_pages.zip (one page each)
     """
     _prune_old_jobs()
+
+    client_ip = request.client.host if request.client else "unknown"
+    if not _check_rate_limit(client_ip, "split-pdf", 15):
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Maximum 15 splits per hour.")
 
     if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted")
