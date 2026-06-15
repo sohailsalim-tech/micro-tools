@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import('next').NextConfig} */
 const securityHeaders = [
   { key: "X-DNS-Prefetch-Control",  value: "on" },
@@ -17,7 +19,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self'",
-      "connect-src 'self' https://pdf-compression-api-production.up.railway.app",
+      "connect-src 'self' https://pdf-compression-api-production.up.railway.app https://o4511569869144064.ingest.us.sentry.io",
       "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
       "object-src 'none'",
       "base-uri 'self'",
@@ -44,4 +46,10 @@ const nextConfig = {
   },
 };
 
-export default nextConfig
+export default withSentryConfig(nextConfig, {
+  org: "astral-logic-smc-priv",
+  project: "javascript",
+  silent: true,
+  disableLogger: true,
+  telemetry: false,
+});
