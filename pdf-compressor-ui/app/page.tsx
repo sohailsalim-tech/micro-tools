@@ -182,6 +182,10 @@ export default function HomePage() {
             Terms of Service
           </Link>
           <span className="mx-2">·</span>
+          <Link href="/about" className="hover:text-foreground transition-colors underline underline-offset-2">
+            About
+          </Link>
+          <span className="mx-2">·</span>
           <span>© {new Date().getFullYear()} OPUS Productivity Tools</span>
         </div>
       </section>
