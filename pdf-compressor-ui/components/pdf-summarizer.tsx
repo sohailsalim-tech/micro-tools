@@ -223,8 +223,38 @@ export function PdfSummarizer() {
                 </div>
               </div>
 
-              <div className="bg-muted/50 rounded-lg p-4 border border-border mb-4 max-h-96 overflow-y-auto">
-                <ReactMarkdown className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-foreground/90 prose-li:text-foreground/90 prose-strong:text-foreground">
+              <div className="bg-muted/50 rounded-lg p-4 border border-border mb-4 max-h-96 overflow-y-auto space-y-3">
+                <ReactMarkdown
+                  components={{
+                    h1: ({ children }) => (
+                      <div className="bg-violet-500/15 text-violet-700 dark:text-violet-300 rounded-lg px-3 py-2 font-bold text-sm mt-2 first:mt-0">{children}</div>
+                    ),
+                    h2: ({ children }) => (
+                      <div className="bg-violet-500/10 text-violet-700 dark:text-violet-300 rounded-lg px-3 py-2 font-semibold text-sm mt-2 first:mt-0">{children}</div>
+                    ),
+                    h3: ({ children }) => (
+                      <div className="border-l-2 border-violet-400 pl-3 py-0.5 font-semibold text-sm text-foreground mt-2">{children}</div>
+                    ),
+                    p: ({ children }) => (
+                      <p className="text-sm text-foreground/90 leading-relaxed">{children}</p>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className="space-y-1 pl-0 list-none">{children}</ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className="space-y-1 pl-4 list-decimal">{children}</ol>
+                    ),
+                    li: ({ children }) => (
+                      <li className="flex items-start gap-2 text-sm text-foreground/90">
+                        <span className="text-violet-500 font-bold mt-0.5 flex-shrink-0">•</span>
+                        <span>{children}</span>
+                      </li>
+                    ),
+                    strong: ({ children }) => (
+                      <strong className="font-semibold text-foreground">{children}</strong>
+                    ),
+                  }}
+                >
                   {summary}
                 </ReactMarkdown>
               </div>
