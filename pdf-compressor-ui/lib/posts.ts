@@ -19,7 +19,7 @@ export const posts: Post[] = [
     title: "How to Compress a PDF Without Losing Quality",
     description:
       "Learn how to reduce your PDF file size by up to 90% without degrading text, images, or formatting — completely free and online.",
-    publishedAt: "2025-06-16",
+    publishedAt: "2026-06-16",
     readTime: 5,
     category: "PDF Tips",
     sections: [
@@ -60,7 +60,7 @@ export const posts: Post[] = [
     title: "5 Best Free PDF Tools Online in 2025 (No Signup Required)",
     description:
       "A roundup of the best free online PDF tools in 2025 — compress, merge, split, convert, and chat with your PDFs. No signup, no watermark.",
-    publishedAt: "2025-06-16",
+    publishedAt: "2026-06-16",
     readTime: 6,
     category: "PDF Tools",
     sections: [
@@ -105,7 +105,7 @@ export const posts: Post[] = [
     title: "How to Translate a PDF to Spanish for Free (Full Document, Instantly)",
     description:
       "Translate any PDF to Spanish online for free — no signup, no software. AI-powered PDF translation that preserves your document structure.",
-    publishedAt: "2025-06-16",
+    publishedAt: "2026-06-16",
     readTime: 4,
     category: "PDF Tips",
     sections: [
