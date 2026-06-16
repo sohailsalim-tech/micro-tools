@@ -242,6 +242,10 @@ export function PdfChat() {
                 className="text-[11px] text-muted-foreground hover:text-foreground transition-colors flex-shrink-0 border border-border rounded-md px-2 py-1">
                 New PDF
               </button>
+              <Link href="/"
+                className="text-[11px] text-muted-foreground hover:text-foreground transition-colors flex-shrink-0 border border-border rounded-md px-2 py-1">
+                ← All tools
+              </Link>
             </div>
 
             {/* Messages */}
