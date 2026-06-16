@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 type Status  = "idle" | "loading" | "chatting" | "error";
@@ -275,7 +276,28 @@ export function PdfChat() {
                       : "bg-muted text-foreground rounded-bl-sm border border-border"
                     }
                   `}>
-                    {msg.content}
+                    {msg.role === "user" ? msg.content : (
+                      <ReactMarkdown
+                        components={{
+                          h1: ({ children }) => <div className="bg-teal-500/15 text-teal-700 dark:text-teal-300 rounded-lg px-3 py-1.5 font-bold text-sm mb-2">{children}</div>,
+                          h2: ({ children }) => <div className="bg-teal-500/10 text-teal-700 dark:text-teal-300 rounded-lg px-3 py-1.5 font-semibold text-sm mb-2 mt-3 first:mt-0">{children}</div>,
+                          h3: ({ children }) => <div className="border-l-2 border-teal-400 pl-3 py-0.5 font-semibold text-sm text-foreground mb-1 mt-2">{children}</div>,
+                          p:  ({ children }) => <p className="text-sm text-foreground/90 leading-relaxed mb-1 last:mb-0">{children}</p>,
+                          ul: ({ children }) => <ul className="space-y-1 pl-0 list-none my-1">{children}</ul>,
+                          ol: ({ children }) => <ol className="space-y-1 pl-4 list-decimal my-1">{children}</ol>,
+                          li: ({ children }) => (
+                            <li className="flex items-start gap-2 text-sm text-foreground/90">
+                              <span className="text-teal-500 font-bold mt-0.5 flex-shrink-0">•</span>
+                              <span>{children}</span>
+                            </li>
+                          ),
+                          strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                          code: ({ children }) => <code className="bg-teal-500/10 text-teal-700 dark:text-teal-300 rounded px-1 py-0.5 text-xs font-mono">{children}</code>,
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    )}
                   </div>
                 </div>
               ))}
