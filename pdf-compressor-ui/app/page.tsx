@@ -147,7 +147,7 @@ export default function HomePage() {
             const card = (
               <div
                 className={`
-                  relative group rounded-xl border-2 border-border p-4 sm:p-6
+                  h-full flex flex-col relative group rounded-xl border-2 border-border p-4 sm:p-6
                   bg-gradient-to-br ${tool.color}
                   transition-all duration-200
                   ${isComingSoon ? "opacity-60 cursor-default" : `cursor-pointer ${tool.border} hover:shadow-lg hover:-translate-y-0.5`}
@@ -165,9 +165,9 @@ export default function HomePage() {
             );
 
             return isComingSoon ? (
-              <div key={tool.title}>{card}</div>
+              <div key={tool.title} className="h-full">{card}</div>
             ) : (
-              <Link key={tool.title} href={tool.href} className="block">
+              <Link key={tool.title} href={tool.href} className="block h-full">
                 {card}
               </Link>
             );
