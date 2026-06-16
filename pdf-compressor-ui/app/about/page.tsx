@@ -64,6 +64,7 @@ export default function AboutPage() {
                 { href: "/excel-to-pdf", label: "Excel to PDF" },
                 { href: "/summarize",    label: "AI PDF Summarizer" },
                 { href: "/translate",    label: "AI PDF Translator" },
+                { href: "/chat",         label: "Chat with PDF" },
               ].map((tool) => (
                 <li key={tool.href}>
                   <Link
