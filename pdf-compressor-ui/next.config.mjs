@@ -19,7 +19,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self'",
-      "connect-src 'self' https://pdf-compression-api-production.up.railway.app https://o4511569869144064.ingest.us.sentry.io",
+      `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL || "https://*.up.railway.app"} https://o4511569869144064.ingest.us.sentry.io`,
       "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
       "object-src 'none'",
       "base-uri 'self'",
