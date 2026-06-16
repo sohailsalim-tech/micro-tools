@@ -8,6 +8,15 @@ import { ShareBar } from "@/components/share-bar";
 
 type Status = "idle" | "ready" | "translating" | "complete" | "error";
 
+const SECTION_COLORS = [
+  { bg: "bg-amber-500/10",  text: "text-amber-700 dark:text-amber-300",   bullet: "text-amber-500",  border: "border-amber-400"  },
+  { bg: "bg-blue-500/10",   text: "text-blue-700 dark:text-blue-300",     bullet: "text-blue-500",   border: "border-blue-400"   },
+  { bg: "bg-emerald-500/10",text: "text-emerald-700 dark:text-emerald-300",bullet: "text-emerald-500",border: "border-emerald-400"},
+  { bg: "bg-violet-500/10", text: "text-violet-700 dark:text-violet-300", bullet: "text-violet-500", border: "border-violet-400" },
+  { bg: "bg-rose-500/10",   text: "text-rose-700 dark:text-rose-300",     bullet: "text-rose-500",   border: "border-rose-400"   },
+  { bg: "bg-teal-500/10",   text: "text-teal-700 dark:text-teal-300",     bullet: "text-teal-500",   border: "border-teal-400"   },
+];
+
 const LANGUAGES = [
   "Spanish",
   "French",
@@ -266,40 +275,32 @@ export function PdfTranslator() {
                 </div>
               </div>
 
-              <div className="bg-muted/50 rounded-lg p-4 border border-border mb-4 max-h-96 overflow-y-auto space-y-3">
-                <ReactMarkdown
-                  components={{
-                    h1: ({ children }) => (
-                      <div className="bg-amber-500/15 text-amber-700 dark:text-amber-300 rounded-lg px-3 py-2 font-bold text-sm mt-2 first:mt-0">{children}</div>
-                    ),
-                    h2: ({ children }) => (
-                      <div className="bg-amber-500/10 text-amber-700 dark:text-amber-300 rounded-lg px-3 py-2 font-semibold text-sm mt-2 first:mt-0">{children}</div>
-                    ),
-                    h3: ({ children }) => (
-                      <div className="border-l-2 border-amber-400 pl-3 py-0.5 font-semibold text-sm text-foreground mt-2">{children}</div>
-                    ),
-                    p: ({ children }) => (
-                      <p className="text-sm text-foreground/90 leading-relaxed">{children}</p>
-                    ),
-                    ul: ({ children }) => (
-                      <ul className="space-y-1 pl-0 list-none">{children}</ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="space-y-1 pl-4 list-decimal">{children}</ol>
-                    ),
-                    li: ({ children }) => (
-                      <li className="flex items-start gap-2 text-sm text-foreground/90">
-                        <span className="text-amber-500 font-bold mt-0.5 flex-shrink-0">•</span>
-                        <span>{children}</span>
-                      </li>
-                    ),
-                    strong: ({ children }) => (
-                      <strong className="font-semibold text-foreground">{children}</strong>
-                    ),
-                  }}
-                >
-                  {translation}
-                </ReactMarkdown>
+              <div className="bg-muted/50 rounded-lg p-4 border border-border mb-4 max-h-96 overflow-y-auto space-y-4">
+                {translation.split(/\n(?=## )/).map((section, i) => {
+                  const s = SECTION_COLORS[i % SECTION_COLORS.length];
+                  return (
+                    <ReactMarkdown
+                      key={i}
+                      components={{
+                        h1: ({ children }) => <div className={`${s.bg} ${s.text} rounded-lg px-3 py-2 font-bold text-sm mb-2`}>{children}</div>,
+                        h2: ({ children }) => <div className={`${s.bg} ${s.text} rounded-lg px-3 py-2 font-semibold text-sm mb-2`}>{children}</div>,
+                        h3: ({ children }) => <div className={`border-l-2 ${s.border} pl-3 py-0.5 font-semibold text-sm text-foreground mb-1`}>{children}</div>,
+                        p:  ({ children }) => <p className="text-sm text-foreground/90 leading-relaxed mb-1">{children}</p>,
+                        ul: ({ children }) => <ul className="space-y-1 pl-0 list-none">{children}</ul>,
+                        ol: ({ children }) => <ol className="space-y-1 pl-4 list-decimal">{children}</ol>,
+                        li: ({ children }) => (
+                          <li className="flex items-start gap-2 text-sm text-foreground/90">
+                            <span className={`${s.bullet} font-bold mt-0.5 flex-shrink-0`}>•</span>
+                            <span>{children}</span>
+                          </li>
+                        ),
+                        strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                      }}
+                    >
+                      {section}
+                    </ReactMarkdown>
+                  );
+                })}
               </div>
 
               <div className="flex flex-col gap-2">
