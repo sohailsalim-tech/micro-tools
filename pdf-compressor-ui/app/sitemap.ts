@@ -21,5 +21,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/about`,         lastModified: new Date(), changeFrequency: "yearly",  priority: 0.4 },
     { url: `${BASE}/pricing`,       lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/refund`,        lastModified: new Date(), changeFrequency: "yearly",  priority: 0.3 },
+    { url: `${BASE}/blog`,          lastModified: new Date(), changeFrequency: "weekly",  priority: 0.8 },
+    { url: `${BASE}/blog/how-to-compress-pdf-without-losing-quality`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
+    { url: `${BASE}/blog/best-free-pdf-tools-online-2025`,            lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
+    { url: `${BASE}/blog/how-to-translate-pdf-to-spanish-free`,       lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
   ];
 }

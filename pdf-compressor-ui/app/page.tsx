@@ -200,6 +200,10 @@ export default function HomePage() {
             Pricing
           </Link>
           <span className="mx-2">·</span>
+          <Link href="/blog" className="hover:text-foreground transition-colors underline underline-offset-2">
+            Blog
+          </Link>
+          <span className="mx-2">·</span>
           <span>© {new Date().getFullYear()} OPUS Productivity Tools</span>
         </div>
       </section>
