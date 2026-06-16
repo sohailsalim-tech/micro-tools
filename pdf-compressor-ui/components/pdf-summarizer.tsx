@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShareBar } from "@/components/share-bar";
 
@@ -222,8 +223,10 @@ export function PdfSummarizer() {
                 </div>
               </div>
 
-              <div className="bg-muted/50 rounded-lg p-4 text-sm text-foreground whitespace-pre-wrap leading-relaxed border border-border mb-4 max-h-96 overflow-y-auto">
-                {summary}
+              <div className="bg-muted/50 rounded-lg p-4 border border-border mb-4 max-h-96 overflow-y-auto">
+                <ReactMarkdown className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-foreground prose-p:text-foreground/90 prose-li:text-foreground/90 prose-strong:text-foreground">
+                  {summary}
+                </ReactMarkdown>
               </div>
 
               <div className="flex flex-col gap-2">
