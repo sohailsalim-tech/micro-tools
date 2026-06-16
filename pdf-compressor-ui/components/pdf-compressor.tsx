@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShareBar } from "@/components/share-bar";
@@ -80,30 +79,6 @@ function CheckCircleIcon({ className }: { className?: string }) {
         d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
       />
     </svg>
-  );
-}
-
-function ShieldIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-      />
-    </svg>
-  );
-}
-
-function OpusLogo({ className }: { className?: string }) {
-  return (
-    <Image src="/opus-logo.png" alt="OPUS" width={64} height={64} className={className} />
-  );
-}
-
-function AstralTechIcon({ className }: { className?: string }) {
-  return (
-    <Image src="/astral-tech-logo.png" alt="Astral Tech" width={20} height={20} className={className} />
   );
 }
 
@@ -350,31 +325,26 @@ export function PDFCompressor() {
   }, [compressedFileUrl, file]);
 
   return (
-    <main className="min-h-screen bg-background py-4 px-3 sm:py-16 sm:px-4">
-      <div className="mx-auto max-w-[600px] w-full">
-        {/* Header */}
-        <header className="mb-5 sm:mb-8">
+    <main className="min-h-screen bg-background py-6 px-3 sm:py-12 sm:px-4">
+      <div className="mx-auto max-w-[680px] w-full">
+
+        <div className="mb-5">
           <div className="flex items-center justify-between mb-4">
-            <Link href="/" className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1">
               ← All tools
             </Link>
             <ThemeToggle />
           </div>
-          <div className="flex justify-center mb-4 sm:mb-6">
-            <OpusLogo className="w-12 h-12 sm:w-16 sm:h-16" />
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-3xl">🗜️</div>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Compress PDF</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground">Reduce PDF file size by up to 90% — free &amp; instant</p>
+            </div>
           </div>
-          <div className="text-center">
-            <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-1 sm:mb-2 tracking-tight">
-              OPUS Productivity Tools
-            </h1>
-            <p className="text-muted-foreground text-sm sm:text-lg leading-tight">
-              Compress PDF files up to 90% • Free &amp; Instant
-            </p>
-          </div>
-        </header>
+        </div>
 
-        {/* Main Card */}
-        <div className="bg-card rounded-xl shadow-lg border border-border p-4 sm:p-8">
+        <div className="bg-card rounded-xl shadow-lg border border-border p-4 sm:p-6">
           {/* Upload Area */}
           {status !== "complete" && (
             <div
@@ -609,16 +579,8 @@ export function PDFCompressor() {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="mt-5 sm:mt-8 text-center text-xs sm:text-sm text-muted-foreground">
-          <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-2">
-            <ShieldIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-            <span className="line-clamp-1">Your privacy is protected. No files stored.</span>
-          </div>
-          <div className="flex items-center justify-center gap-1.5">
-            <Image src="/opus-logo.png" alt="OPUS" width={14} height={14} className="opacity-40" />
-            <span className="text-xs sm:text-sm">OPUS Productivity Tools</span>
-          </div>
+        <footer className="mt-5 text-center text-xs text-muted-foreground">
+          <span>🔒 Your files are never stored</span>
         </footer>
       </div>
     </main>

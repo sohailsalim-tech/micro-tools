@@ -273,7 +273,7 @@ export function WordToPdf() {
         </section>
 
         <footer className="mt-5 text-center text-xs text-muted-foreground">
-          <span>🔒 Your files are never stored on our servers</span>
+          <span>🔒 Your files are never stored</span>
         </footer>
       </div>
     </main>

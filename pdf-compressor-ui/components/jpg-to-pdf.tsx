@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ShareBar } from "@/components/share-bar";
@@ -386,12 +385,8 @@ export function JpgToPdf() {
           </div>
         </section>
 
-        {/* Footer */}
         <footer className="mt-5 text-center text-xs text-muted-foreground">
-          <div className="flex items-center justify-center gap-1.5">
-            <Image src="/opus-logo.png" alt="OPUS" width={14} height={14} className="opacity-40" />
-            <span>OPUS Productivity Tools</span>
-          </div>
+          <span>🔒 Your files are never stored</span>
         </footer>
       </div>
     </main>
